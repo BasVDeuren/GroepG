@@ -39,7 +39,7 @@ public class IntegrationTokenFilterTests extends BaseFilteredIntegrationTests {
         objectMapper = new ObjectMapper();
         requestBuilder = get("/auth/user");
         Session session = sessionFactory.getCurrentSession();
-        testUser = new User("testUsername", "testPassword", "testEmail");
+        testUser = new User("testUsername", "testPassword", "testEmail", true);
         session.saveOrUpdate(testUser);
     }
 

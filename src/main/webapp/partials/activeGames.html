@@ -1,74 +1,52 @@
 <div class="container pagecontainer">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-            <accordion close-others="oneAtATime" id="gamesAccodion">
-                <accordion-group heading="{{'ACTIVE_GAMES' | translate}}">
-                    <table class="table table-hover table-condensed">
-                        <thead>
-                        <tr>
-                            <th>{{'GAME' | translate}}</th>
-                            <th>{{'OPPONENT' | translate}}</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="game in games" ng-show="isActiveGame(game) && isNotEndedGame(game)">
-                            <td>{{game.name}}</td>
-                            <td>{{getPlayersOrdered(game)[1].playerName}}</td>
-                            <td class="alignRight">
-                                <button class="btn btn-warning" name="btnPlay" type="button"
-                                        ng-click="goToGame(game.gameId)"><i class="fa fa-chevron-circle-right"></i> {{'PLAY' | translate}}
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </accordion-group>
-                <accordion-group heading="{{'PENDING_GAMES' | translate}}">
-                    <table class="table table-hover table-condensed" class="gamesTable">
-                        <thead class="header">
-                        <tr>
-                            <th>{{'GAME' | translate}}</th>
-                            <th>{{'OPPONENT' | translate}}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="game in games" ng-show="isPendingGame(game)">
-                            <td>{{game.name}}</td>
-                            <td>{{getPlayersOrdered(game)[1].playerName}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </accordion-group>
-                <accordion-group heading="{{'INVITED_GAMES' | translate}}" is-open="true">
-                    <table class="table table-hover table-condensed" id="inviteTable">
-                        <thead class="header">
-                        <tr>
-                            <th>{{'GAME' | translate}}</th>
-                            <th>{{'OPPONENT' | translate}}</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="game in games" ng-show="isInvitedGame(game)">
-                            <td>{{game.name}}</td>
-                            <td>{{getPlayersOrdered(game)[1].playerName}}</td>
-                            <td class="alignRight">
-                                <button class="btn btn-success" name="btnAccept" type="button"
-                                        ng-click="acceptInvite(game)"><i class="fa fa-check"></i> {{'ACCEPT' | translate}}
-                                </button>
-                            </td>
-                            <td class="alignRight">
-                                <button class="btn btn-danger" name="btnDecline" type="button"
-                                        ng-click="declineInvite(game)"><i class="fa fa-times"></i> {{'DECLINE' | translate}}
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </accordion-group>
-            </accordion>
+            <div class="panel panel-default">
+                <table class="table table-hover table-condensed">
+                    <thead>
+                    <tr>
+                        <th>{{'GAME' | translate}}</th>
+                        <th>{{'OPPONENT' | translate}}</th>
+                        <th>{{'STATE' | translate}}</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="game in games" ng-show="isActiveGame(game) && isNotEndedGame(game)">
+                        <td>{{game.name}}</td>
+                        <td>{{getPlayersOrdered(game)[1].playerName}}</td>
+                        <td>{{'ACTIVE' | translate}}</td>
+                        <td class="alignRight">
+                            <button class="btn btn-warning" name="btnPlay" type="button"
+                                    ng-click="goToGame(game.gameId)"><i class="fa fa-chevron-circle-right"></i> {{'PLAY' | translate}}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="game in games" ng-show="isPendingGame(game)">
+                        <td>{{game.name}}</td>
+                        <td>{{getPlayersOrdered(game)[1].playerName}}</td>
+                        <td>{{'PENDING' | translate}}</td>
+                        <td></td>
+                    </tr>
+                    <tr ng-repeat="game in games" ng-show="isInvitedGame(game)">
+                        <td>{{game.name}}</td>
+                        <td>{{getPlayersOrdered(game)[1].playerName}}</td>
+                        <td>{{'INVITED' | translate}}</td>
+                        <td class="alignRight">
+                            <button class="btn btn-success" name="btnAccept" type="button"
+                                    ng-click="acceptInvite(game)"><i class="fa fa-check"></i> {{'ACCEPT' | translate}}
+                            </button>
+
+                            <button class="btn btn-danger" name="btnDecline" type="button"
+                                    ng-click="declineInvite(game)"><i class="fa fa-times"></i> {{'DECLINE' | translate}}
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
         </div>
     </div>
 </div>

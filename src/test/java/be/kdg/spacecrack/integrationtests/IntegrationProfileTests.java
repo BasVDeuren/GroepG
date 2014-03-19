@@ -6,9 +6,7 @@ package be.kdg.spacecrack.integrationtests;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.viewmodels.ProfileWrapper;
-import be.kdg.spacecrack.viewmodels.UserViewModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,24 +21,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //import org.codehaus.jackson.map.ObjectMapper;
 
 public class IntegrationProfileTests extends BaseFilteredIntegrationTests {
-    public static final String USERNAME = "profiletestusername";
-    private AccessToken accessToken;
+
 
     @Before
     public void setUp() throws Exception {
-        String UserWrapper = objectMapper.writeValueAsString(new UserViewModel(USERNAME, "password", "password", "email@gmail.com"));
-        MockHttpServletRequestBuilder postRequestBuilder = post("/user");
-        String stringAccessToken = mockMvc.perform(postRequestBuilder
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(UserWrapper)).andReturn().getResponse().getContentAsString();
 
-        accessToken = objectMapper.readValue(stringAccessToken, AccessToken.class);
     }
 
     @Test
     public void testUpdateEditProfile_ValidProfile_statusOk() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
+        String accessToken = loginAndRetrieveAccessToken();
 
         ProfileWrapper profile = new ProfileWrapper("firstname", "lastname", "email", "12-01-2013", "image");
 
@@ -50,6 +41,6 @@ public class IntegrationProfileTests extends BaseFilteredIntegrationTests {
         mockMvc.perform(postRequestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(profileJson)
-                .cookie(new Cookie("accessToken", "%22" + accessToken.getValue() + "%22"))).andExpect(status().isOk());
+                .cookie(new Cookie("accessToken",  accessToken ))).andExpect(status().isOk());
     }
 }

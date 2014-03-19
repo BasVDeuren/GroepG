@@ -321,7 +321,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
         drawColonies(gameData);
         updateCommandPoints();
         var loserPlayerId = gameData.loserPlayerId;
-        if (loserPlayerId != 0) {
+        if (loserPlayerId > 0) {
             if ($scope.game.activePlayerId == loserPlayerId) {
                 showNotification($translate('LOSTTHEGAME'));
 
@@ -336,7 +336,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             for (var shipKey in $scope.game.shipXSpritesById) {
                 $scope.game.shipXSpritesById[shipKey].inputEnabled = false;
             }
-            $scope.selectedSpaceShipXSprite == undefined;
+            $scope.selectedSpaceShipXSprite = undefined;
             allPlanetsNormal();
             btnEndTurn.visible = false;
             btnEndTurn.inputEnabled = false;

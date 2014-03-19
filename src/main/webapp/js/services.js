@@ -99,4 +99,6 @@ angular.module('spaceServices', ['ngResource'])
         return $resource('/api/auth/statistics');
     }).factory('MailService', function($resource){
         return $resource('/api/auth/invitation');
+    }).factory('VerificationService', function($resource){
+        return $resource('/api/verifiedUser');
     });

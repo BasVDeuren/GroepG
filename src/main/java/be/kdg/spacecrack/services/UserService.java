@@ -7,15 +7,25 @@ package be.kdg.spacecrack.services;/* Git $Id
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackAlreadyExistsException;
+import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
+import be.kdg.spacecrack.Exceptions.SpaceCrackUnexpectedException;
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.Profile;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
+import be.kdg.spacecrack.repositories.ProfileRepository;
+import be.kdg.spacecrack.utilities.ITokenStringGenerator;
+import be.kdg.spacecrack.utilities.TokenStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.Random;
 
@@ -27,12 +37,26 @@ public class UserService implements IUserService {
 
     @Autowired
     private IProfileRepository profileRepository;
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    private ITokenStringGenerator tokenStringGenerator;
 
-    public UserService() {}
+    public UserService() {
+    }
 
-    public UserService(IUserRepository userRepository, IProfileRepository profileRepository) {
+    public UserService(IUserRepository userRepository, IProfileRepository profileRepository, JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
+        this.mailSender = mailSender;
+        tokenStringGenerator = new TokenStringGenerator();
+    }
+
+    public UserService(IUserRepository userRepository, ProfileRepository profileRepository, JavaMailSender mailSender, ITokenStringGenerator tokenStringGenerator) {
+        this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
+        this.mailSender = mailSender;
+        this.tokenStringGenerator = tokenStringGenerator;
     }
 
     @Override
@@ -46,25 +70,52 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void registerUser(String username, String password, String email)  {
+    public void registerUser(String username, String password, String email) {
         User userByUsername = userRepository.getUserByUsername(username);
-        if(userByUsername != null) {
+        if (userByUsername != null) {
             throw new SpaceCrackAlreadyExistsException();
         }
 
         User userByEmail = userRepository.getUserByEmail(email);
-        if(userByEmail != null) {
+        if (userByEmail != null) {
             throw new SpaceCrackAlreadyExistsException();
         }
-        User user = userRepository.addUser(username, password, email);
 
-        if(user.getProfile() == null){
-            Profile profile = new Profile();
-            profile.setUser(user);
-            user.setProfile(profile);
-            profileRepository.createProfile(profile);
-            userRepository.updateUser(user);
+        User user = new User(username, password, email, false);
+        Profile profile = new Profile();
+        profile.setUser(user);
+        user.setProfile(profile);
+        user.setVerificationToken(tokenStringGenerator.generateTokenString());
+        userRepository.createUser(user);
+        MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
+        try {
+            mimeMessage.setContent(
+                    "<p>" +
+                            "Dear " + username + ", " +
+                            "</p>" +
+                            "<p>" +
+                            "This is your verification code: " + user.getVerificationToken() +
+                            "</p>" +
+                            "<p>Press this link to confirm your registration to Spacecrack : " +
+                            "</p>" +
+                            "<p>" +
+                            "<a href=\"http://localhost:8080/#/verify\">Verify your registration here</a>" +
+                            "</p>" +
+                            "<p></p>" +
+                            "<p>Have fun playing spacecrack!" +
+                            "</p>" +
+                            "<p>Yours sincerely, " +
+                            "</p>" +
+                            "<p>GroupG" +
+                            "</p>",
+                    "text/html");
+            mimeMessage.setRecipients(Message.RecipientType.TO, email);
+            mimeMessage.setSubject("SpaceCrack registration confirmation");
+
+        } catch (MessagingException e) {
+            throw new SpaceCrackUnexpectedException("Something bad happened");
         }
+        mailSender.send(mimeMessage);
     }
 
     @Override
@@ -89,7 +140,18 @@ public class UserService implements IUserService {
         do {
             Random random = new Random();
             foundUser = users.get(random.nextInt(users.size()));
-        } while(foundUser.getUserId() == userId);
+        } while (foundUser.getUserId() == userId);
         return foundUser;
+    }
+
+    @Override
+    public void verifyUser(String tokenValue) {
+
+        User user = userRepository.findUserByVerificationTokenValue(tokenValue);
+        if (user == null) {
+            throw new SpaceCrackNotAcceptableException("invalid verificationToken");
+        }
+        user.setVerified(true);
+        userRepository.updateUser(user);
     }
 }

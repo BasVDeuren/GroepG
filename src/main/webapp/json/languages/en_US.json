@@ -87,5 +87,16 @@
     "VIEW_PROFILE": "View Profile",
     "MAILSENT": "A mail has been sent to ",
     "INVITEHASSEND":"The invite has been send to your opponent",
-    "GOTOACTIVEGAMES" : "Go to active games"
+    "GOTOACTIVEGAMES" : "Go to active games",
+    "VERIFYTITLE":"Enter Verificationcode",
+    "VERIFYSUCCESSTITLE" : "Verification successful!",
+    "VERIFICATIONTEXT":"You will be redirected to the login page in a few seconds",
+    "VERIFYFAILEDTITLE":"Verification failed, please try again.",
+    "VERIFY":"Verify",
+    "VERIFYEMAILSEND":"An email has been send, check your email to find your verificationtoken.",
+    "INVITED": "Invited",
+    "ACTIVE":"Active",
+    "PENDING":"Pending",
+    "STATE": "State"
+
 }

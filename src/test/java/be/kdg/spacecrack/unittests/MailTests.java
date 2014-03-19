@@ -27,7 +27,7 @@ public class MailTests {
         IMailService mailService = new MailService(mailSender);
 
         String receiver = "test@mailadres.be";
-        User sender = new User("testuser1234", "test", "testuser@gmail.com");
+        User sender = new User("testuser1234", "test", "testuser@gmail.com", true);
         sender.setProfile(new Profile("Alice", "In wonderland", null, null));
 
        String expectedMessage = "Hello there, your friend Alice In wonderland invites you for a game of spacecrack, would you like to register?\n" +

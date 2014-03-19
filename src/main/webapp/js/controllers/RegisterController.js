@@ -24,10 +24,9 @@ spaceApp.controller("RegisterController", function ($scope, Register, $cookieSto
         };
 
             Spinner.spinner.spin(Spinner.target);
-            Register.save(hashedRegisterData, function (data) {
+            Register.save(hashedRegisterData, function () {
                 Spinner.spinner.stop();
-                $cookieStore.put('accessToken', data.value);
-                $scope.go('/spacecrack/home');
+                $scope.go('/verify');
                 $scope.hasRegistrationFailed = false;
                 $scope.userNameAlreadyInUse = false;
             }, function (response) {

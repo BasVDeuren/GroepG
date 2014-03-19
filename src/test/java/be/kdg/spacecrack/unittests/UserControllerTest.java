@@ -6,6 +6,7 @@ import be.kdg.spacecrack.controllers.UserController;
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.IUserRepository;
+import be.kdg.spacecrack.repositories.ProfileRepository;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IUserService;
 import be.kdg.spacecrack.services.UserService;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -59,12 +61,12 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void RegisterUser_validUser_usercreated() throws Exception {
-        AccessToken expected = new AccessToken("test1234");
-        stub(tokenService.login(any(User.class))).toReturn(expected);
-        UserViewModel userWrapper = new UserViewModel("username", "password", "password", "email");
 
-        AccessToken actual = userController.registerUser(userWrapper);
-        assertEquals("Accesstoken should be returned after registering. ", expected, actual);
+
+        UserViewModel userWrapper = new UserViewModel("username", "password", "password", "email");
+        UserController userController1 = new UserController(new UserService(userRepository, new ProfileRepository(sessionFactory), mock(JavaMailSender.class)), tokenService);
+         userController1.registerUser(userWrapper);
+        verify(userRepository, VerificationModeFactory.times(1)).createUser(any(User.class));
     }
 
     @Test(expected = SpaceCrackNotAcceptableException.class)
@@ -74,7 +76,7 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void editUser_ValidFields_UserEdited() throws Exception {
-        User user = new User("username", "password", "email");
+        User user = new User("username", "password", "email", true);
         when(userService.getUserByAccessToken(any(AccessToken.class))).thenReturn(user);
 
         userController.editUser(new UserViewModel("username", "password", "password", "email"), objectMapper.writeValueAsString(new AccessToken("accesstoken1234")));
@@ -87,7 +89,7 @@ public class UserControllerTest extends BaseUnitTest {
         expectedEx.expect(SpaceCrackNotAcceptableException.class);
         expectedEx.expectMessage("Passwords should be the same!");
 
-        User user = new User("username", "password", "email");
+        User user = new User("username", "password", "email", true);
         when(userRepository.getUserByAccessToken(any(AccessToken.class))).thenReturn(user);
 
         userController.registerUser(new UserViewModel("username", "password", "password", "email"));
@@ -96,7 +98,7 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void testGetUser_validToken_User() throws Exception {
-        User expextedUser = new User("username", "password", "email");
+        User expextedUser = new User("username", "password", "email", true);
         AccessToken accessToken = new AccessToken("accesstoken123");
         expextedUser.setToken(accessToken);
 
@@ -120,7 +122,7 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void testGetUsers_validUserName_User() throws Exception {
-        User user = new User("Jacky", "password", "email");
+        User user = new User("Jacky", "password", "email", true);
         List<User> foundUsers = new ArrayList<User>();
         AccessToken accessToken = new AccessToken("accesstoken123");
         user.setToken(accessToken);
@@ -135,7 +137,7 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void testGetUsers_validEmail_User() throws Exception {
-        User user = new User("Tommy", "password", "tommy@gmail.com");
+        User user = new User("Tommy", "password", "tommy@gmail.com", true);
         List<User> foundUsers = new ArrayList<User>();
         AccessToken accessToken = new AccessToken("accesstoken321");
         user.setToken(accessToken);
@@ -149,11 +151,11 @@ public class UserControllerTest extends BaseUnitTest {
 
     @Test
     public void testGetUser_UserId_User() throws Exception {
-        User user1 = new User("Jacky", "password", "email");
+        User user1 = new User("Jacky", "password", "email", true);
         AccessToken accessToken = new AccessToken("accesstoken123");
         user1.setToken(accessToken);
 
-        User user2 = new User("barry", "password", "email");
+        User user2 = new User("barry", "password", "email", true);
         AccessToken accessToken2 = new AccessToken("accesstoken123321");
         user2.setToken(accessToken2);
 

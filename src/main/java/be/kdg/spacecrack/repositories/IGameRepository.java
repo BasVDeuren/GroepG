@@ -26,4 +26,6 @@ public interface IGameRepository {
     Game getGameRevision(Number number, int gameId);
 
     List<Integer> getRevisionNumbers(int gameId);
+
+    Game getGameForUpdate(Game game);
 }

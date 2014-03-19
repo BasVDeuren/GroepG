@@ -1,6 +1,5 @@
 package be.kdg.spacecrack.integrationtests;
 
-import be.kdg.spacecrack.config.AsyncConfig;
 import be.kdg.spacecrack.controllers.*;
 import be.kdg.spacecrack.filters.TokenHandlerInterceptor;
 import be.kdg.spacecrack.model.AccessToken;
@@ -10,18 +9,21 @@ import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.*;
 import be.kdg.spacecrack.services.handlers.IMoveShipHandler;
 import be.kdg.spacecrack.services.handlers.MoveShipHandler;
-import be.kdg.spacecrack.utilities.*;
+import be.kdg.spacecrack.utilities.IFirebaseUtil;
+import be.kdg.spacecrack.utilities.ITokenStringGenerator;
+import be.kdg.spacecrack.utilities.TokenStringGenerator;
+import be.kdg.spacecrack.utilities.ViewModelConverter;
 import be.kdg.spacecrack.validators.BeanValidator;
 import be.kdg.spacecrack.viewmodels.GameActivePlayerWrapper;
 import be.kdg.spacecrack.viewmodels.GameParameters;
 import be.kdg.spacecrack.viewmodels.ProfileWrapper;
-import be.kdg.spacecrack.viewmodels.UserViewModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -71,6 +73,7 @@ public abstract class BaseFilteredIntegrationTests {
 
     @Autowired
     SessionFactory sessionFactory;
+    private JavaMailSender mockMailSender;
 
     @Before
     public void setupMockMVC() throws Exception {
@@ -97,7 +100,8 @@ public abstract class BaseFilteredIntegrationTests {
             IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, moveShipHandler, viewModelConverter, mockGameSynchronizer);
             IAuthorizationService authorizationService = new AuthorizationService(tokenRepository, userRepository, tokenStringGenerator);
 
-            IUserService userService = new UserService(userRepository, profileRepository);
+            mockMailSender = mock(JavaMailSender.class);
+            IUserService userService = new UserService(userRepository, profileRepository, mockMailSender);
             IProfileService profileService = new ProfileService(profileRepository, userRepository);
 
             ActionController actionController = new ActionController(gameService, viewModelConverter, firebaseUtil);
@@ -131,8 +135,16 @@ public abstract class BaseFilteredIntegrationTests {
         return exceptionResolver;
     }
     protected String loginAndRetrieveAccessToken() throws Exception {
-        String md5HashedPassword = getMD5HashedPassword("test");
-        User testUser = new User("test", md5HashedPassword, "test@gmail.com");
+        String username = "test";
+        String password = "test";
+        String email = "test@gmail.com";
+
+        return loginExistingUserAndRetrieveAccessToken(username, password, email);
+    }
+
+    private String loginExistingUserAndRetrieveAccessToken(String username, String password, String email) throws Exception {
+        String md5HashedPassword = getMD5HashedPassword(password);
+        User testUser = new User(username, md5HashedPassword, email, true);
         String userJson = objectMapper.writeValueAsString(testUser);
 
         MockHttpServletRequestBuilder requestBuilder = post("/accesstokens");
@@ -165,28 +177,9 @@ public abstract class BaseFilteredIntegrationTests {
     }
 
     private String logOpponentIn() throws Exception {
-        UserViewModel opponentUserWrapper = new UserViewModel("opponent", "opponentpw", "opponentpw", "opponent@gmail.com");
-        String userWrapperjson = objectMapper.writeValueAsString(opponentUserWrapper);
 
-        String opponentAccessTokenJson = mockMvc.perform(post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userWrapperjson)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-
-        AccessToken opponentAccessToken = objectMapper.readValue(opponentAccessTokenJson, AccessToken.class);
-
-        String userjson = mockMvc.perform(get("/auth/user")
-                .cookie(new Cookie("accessToken", "%22" + opponentAccessToken.getValue() + "%22"))).andReturn().getResponse().getContentAsString();
-
-        MockHttpServletRequestBuilder requestBuilder = post("/accesstokens");
-        String accessTokenJson = mockMvc.perform(requestBuilder
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userjson)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
-
-        AccessToken accessToken = objectMapper.readValue(accessTokenJson, AccessToken.class);
-
-        return "%22" + accessToken.getValue() + "%22";
+        String accessToken = loginExistingUserAndRetrieveAccessToken("opponentTest", "test", "opponentje@gmail.com");
+        return accessToken;
     }
 
     protected GameActivePlayerWrapper createAGame(String accessToken) throws Exception {

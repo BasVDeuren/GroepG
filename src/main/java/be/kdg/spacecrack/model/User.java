@@ -30,6 +30,9 @@ public class User implements Serializable {
     @Column(unique = true)
     private String email;
 
+    @Column
+    private boolean verified;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accesstokenid", nullable = true)
     @JsonManagedReference
@@ -40,14 +43,16 @@ public class User implements Serializable {
     @JoinColumn(name= "profileId", nullable = true)
     @JsonManagedReference
     private Profile profile;
+    private String verificationToken;
 
     public User() {}
 
 
-    public User(String username, String pw, String email) {
+    public User(String username, String pw, String email, boolean verified) {
         this.username = username;
         this.password = pw;
         this.email = email;
+        this.verified = verified;
     }
 
     public int getUserId() {
@@ -96,5 +101,21 @@ public class User implements Serializable {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
     }
 }

@@ -140,7 +140,9 @@ public class GameService implements IGameService {
     @Override
     public void endTurn(Integer playerID) {
         Player player = playerRepository.getPlayerByPlayerId(playerID);
-        Game game = player.getGame();
+        Game game = gameRepository.getGameForUpdate(player.getGame());
+
+
         if (!player.isTurnEnded()) {
             int commandPoints = player.getCommandPoints();
             player.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);

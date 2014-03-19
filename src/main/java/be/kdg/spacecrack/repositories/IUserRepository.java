@@ -16,6 +16,7 @@ public interface IUserRepository {
 
     User getUser(User user);
 
+    @Deprecated
     User addUser(String username, String password, String email);
 
     User getUserByUsername(String username);
@@ -34,4 +35,6 @@ public interface IUserRepository {
 
 
     User getUserByEmail(String email);
+
+    User findUserByVerificationTokenValue(String tokenValue);
 }

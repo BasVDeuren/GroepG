@@ -1,0 +1,41 @@
+<div class="container pagecontainer">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <div ng-show="verified=='verifying'" name="verifyForm">
+
+                        <form class="form-horizontal" role="form" ng-submit="verify()" name="verificationForm">
+
+
+                            <div class="col-sm-8">
+                                <h4>{{'VERIFYTITLE' | translate}}</h4>
+
+                                <p>{{'VERIFYEMAILSEND' | translate}}</p>
+                                <input type="text" class="form-control" id="txtVerificationToken"
+                                       placeholder="Verification Code" name="uname" ng-model="verificationToken"
+                                       required="true">
+                            <span class="label label-danger"
+                                  ng-show="invalidToken">{{'VERIFYFAILEDTITLE' | translate}}!</span>
+                            </div>
+                            <div class="col-sm-8">
+                                <button class="btn btn-default" type="submit">{{'VERIFY' | translate}}</button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <div ng-show="verified=='success'">
+                        <h4>{{'VERIFYSUCCESSTITLE' | translate}}</h4>
+
+                        <p>
+                            {{'VERIFICATIONTEXT' | translate}}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -45,11 +45,13 @@ public class UserRepository implements IUserRepository {
         return dbUser;
     }
 
+
+    @Deprecated
     @Override
     public User addUser(String username, String password, String email) {
         Session session = sessionFactory.getCurrentSession();
 
-        User user = new User(username, password, email);
+        User user = new User(username, password, email, true);
         session.saveOrUpdate(user);
 
         return user;
@@ -126,5 +128,13 @@ public class UserRepository implements IUserRepository {
         q.setParameter("email", email);
 
         return (User) q.uniqueResult();
+    }
+
+    @Override
+    public User findUserByVerificationTokenValue(String tokenValue) {
+        Session session = sessionFactory.getCurrentSession();
+        @SuppressWarnings("JpaQlInspection") Query query = session.createQuery("from User u where u.verificationToken = :verificationToken AND u.verified = false");
+        query.setParameter("verificationToken", tokenValue);
+        return (User) query.uniqueResult();
     }
 }

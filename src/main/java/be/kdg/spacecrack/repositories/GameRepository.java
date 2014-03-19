@@ -8,6 +8,7 @@ package be.kdg.spacecrack.repositories;/* Git $Id
 
 import be.kdg.spacecrack.model.Game;
 import be.kdg.spacecrack.model.Profile;
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -88,6 +89,19 @@ public class GameRepository implements IGameRepository {
         }
 
         return revisionsIntegers;
+    }
+
+    @Override
+    public Game getGameForUpdate(Game game) {
+        Session session = sessionFactory.getCurrentSession();
+
+
+        @SuppressWarnings("JpaQlInspection") Query q = session.createQuery("from Game g where g.gameId = :gameId");
+        q.setParameter("gameId", game.getGameId());
+        q.setLockOptions(LockOptions.UPGRADE);
+        game = (Game) q.uniqueResult();
+
+        return game;
     }
 
     @Override

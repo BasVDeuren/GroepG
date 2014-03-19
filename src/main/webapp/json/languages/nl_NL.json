@@ -86,5 +86,15 @@
     "VIEW_PROFILE": "Profiel bekijken",
     "MAILSENT": "Er is een mail gestuurd naar ",
     "INVITEHASSEND":"De uitnodiging is verstuurd naar de tegenstander",
-    "GOTOACTIVEGAMES" : "Ga naar actieve spelen"
+    "GOTOACTIVEGAMES" : "Ga naar actieve spelen",
+    "VERIFYSUCCESSTITLE": "Je registratie is bevestigd!",
+    "VERIFYTITLE":"Verificatiecode invoeren",
+    "VERIFYFAILEDTITLE":"De registratie is mislukt, probeer het opnieuw.",
+    "VERIFICATIONTEXT":"Je wordt automatisch doorverwezen naar de login pagina binnen enkele seconden",
+    "VERIFY":"Verifieer",
+    "VERIFYEMAILSEND":"Er is een email gestuurd, kijk deze na om je verificatietoken te vinden.",
+    "INVITED": "Uitgenodigd",
+    "ACTIVE":"Bezig",
+    "PENDING":"In afwachting",
+    "STATE": "Status"
 }

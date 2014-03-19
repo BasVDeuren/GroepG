@@ -19,11 +19,10 @@ function appRouter($routeProvider, $httpProvider) {
 
         function error(response) {
             var status = response.status;
-            if ($location.path() !== "/login") {
+            if ($location.path() !== "/login" && $location.path() !== "/verify") {
                 if (status == 401) {
                     $rootScope.loggedInBool = false;
                     $rootScope.facebookBool = false;
-
                     $rootScope.$apply();
                     console.info("unauthorized");
                     console.info($location.path());
@@ -53,6 +52,9 @@ function appRouter($routeProvider, $httpProvider) {
         .when('/login', {
             templateUrl: 'partials/login.html',
             controller: 'LoginController'
+        }).when('/verify', {
+            templateUrl: 'partials/verify.html',
+            controller: 'VerifyController'
         })
         .when('/spacecrack/game', {
             templateUrl: 'partials/game.html',

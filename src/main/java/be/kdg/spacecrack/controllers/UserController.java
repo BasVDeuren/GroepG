@@ -7,6 +7,7 @@ import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IUserService;
 import be.kdg.spacecrack.viewmodels.UserViewModel;
+import be.kdg.spacecrack.viewmodels.VerificationTokenViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -41,23 +42,22 @@ public class UserController {
 
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public AccessToken registerUser(@RequestBody @Valid UserViewModel userWrapper) throws Exception {
-        AccessToken accessToken;
+    public void registerUser(@RequestBody @Valid UserViewModel userWrapper) throws Exception {
+
         if (userWrapper.getPassword().equals(userWrapper.getPasswordRepeated())) {
             userService.registerUser(userWrapper.getUsername(), userWrapper.getPassword(), userWrapper.getEmail());
-            accessToken = authorizationService.login(userService.getUserByUsername(userWrapper.getUsername()));
-        } else {
+            } else {
             throw new SpaceCrackNotAcceptableException("Password and repeat password aren't equal");
         }
 
-        return accessToken;
+
     }
 
     @RequestMapping(value = "/auth/user", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public void editUser(@RequestBody UserViewModel userWrapper, @CookieValue("accessToken") String accessTokenValue) throws Exception {
         AccessToken accessToken = authorizationService.getAccessTokenByValue(accessTokenValue);
-        User user = userService.getUserByAccessToken(accessToken);;
+        User user = userService.getUserByAccessToken(accessToken);
 
         if (userWrapper.getPassword().equals(userWrapper.getPasswordRepeated())) {
             user.setPassword(userWrapper.getPassword());
@@ -97,4 +97,12 @@ public class UserController {
     public User getRandomUser(@PathVariable int userId) throws Exception {
         return userService.getRandomUser(userId);
     }
+
+    @RequestMapping(value= "/verifiedUser", method = RequestMethod.POST)
+    @ResponseBody
+    public void verifyRegistration(@RequestBody VerificationTokenViewModel verificationTokenViewModel){
+        userService.verifyUser(verificationTokenViewModel.getTokenValue());
+
+    }
+
 }

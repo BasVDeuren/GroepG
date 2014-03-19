@@ -7,20 +7,16 @@ package be.kdg.spacecrack.services;/* Git $Id
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackUnauthorizedException;
-import be.kdg.spacecrack.controllers.TokenController;
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.Profile;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.ITokenRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -74,7 +70,7 @@ public class AuthorizationService implements IAuthorizationService {
             Profile profile = new Profile();
             profile.setFirstname(firstname);
             profile.setLastname(lastname);
-            User user = new User(testUsername, testPassword, testemail);
+            User user = new User(testUsername, testPassword, testemail, true);
             user.setProfile(profile);
             profile.setUser(user);
             userRepository.createUser(user);
@@ -85,9 +81,10 @@ public class AuthorizationService implements IAuthorizationService {
     public AccessToken login(User user) {
         User dbUser;
         dbUser = userRepository.getUser(user);
-        if (dbUser == null) {
+        if (dbUser == null || !dbUser.isVerified()) {
             throw new SpaceCrackUnauthorizedException();
         }
+
         AccessToken accessToken = dbUser.getToken();
 
         if (accessToken == null) {
@@ -100,6 +97,8 @@ public class AuthorizationService implements IAuthorizationService {
         }
         return accessToken;
     }
+
+
 
     @Override
     public void logout(String accessTokenValue) {

@@ -25,4 +25,6 @@ public interface IUserService {
     List<User> getUsersByEmail(String tom) throws Exception;
 
     User getRandomUser(int UserId) throws Exception;
+
+    void verifyUser(String tokenValue);
 }

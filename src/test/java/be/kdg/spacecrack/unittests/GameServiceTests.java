@@ -486,7 +486,7 @@ public class GameServiceTests extends BaseUnitTest {
     public void deleteGame() throws Exception {
         TransactionStatus status1 = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED));
 
-        User deleteGameTestUser = new User("Bart", "bartjetopdocent", "bartjebartje@gmail.com");
+        User deleteGameTestUser = new User("Bart", "bartjetopdocent", "bartjebartje@gmail.com", true);
         Profile profile = new Profile("Bart", "Bartels", null, null);
         deleteGameTestUser.setProfile(profile);
 

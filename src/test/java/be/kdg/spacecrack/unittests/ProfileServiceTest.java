@@ -49,7 +49,7 @@ public class ProfileServiceTest extends BaseUnitTest{
         ProfileRepository profileRepository = mock(ProfileRepository.class);
         ProfileService contactService = new ProfileService(profileRepository, userRepository);
 
-        User user = new User("username", "password", "email");
+        User user = new User("username", "password", "email",true);
         session = sessionFactory.getCurrentSession();
         session.saveOrUpdate(user);
 
@@ -71,7 +71,7 @@ public class ProfileServiceTest extends BaseUnitTest{
         ProfileRepository profileRepository = mock(ProfileRepository.class);
         ProfileService profileService = new ProfileService(profileRepository, userRepository);
 
-        User user = new User("username", "password", "email");
+        User user = new User("username", "password", "email", true);
         session = sessionFactory.getCurrentSession();
 
         session.saveOrUpdate(user);
@@ -93,7 +93,7 @@ public class ProfileServiceTest extends BaseUnitTest{
         ProfileService profileService = new ProfileService(profileRepository, userRepository);
         tokenController = mock(TokenController.class);
 
-        User user = new User("username", "password", "email");
+        User user = new User("username", "password", "email", true);
 
         AccessToken token = new AccessToken("accesstoken123");
         stub(tokenController.login(user)).toReturn(token);

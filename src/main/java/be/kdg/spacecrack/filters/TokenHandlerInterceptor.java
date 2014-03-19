@@ -12,6 +12,7 @@ import be.kdg.spacecrack.services.IAuthorizationService;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
+import java.io.IOException;
 
 public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
     private IAuthorizationService authorizationService;
@@ -44,7 +45,7 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
                     tokenValue = cookie.getValue();
                     if(tokenValue == null || tokenValue.isEmpty())
                     {
-                        responseWrapper.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You are unauthorized for this request");
+                        sendUnauthorized(responseWrapper);
                         return false;
                     }
                     tokenValue = tokenValue.substring(3, tokenValue.length() - 3);
@@ -56,7 +57,7 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
             try {
                 token = authorizationService.getAccessTokenByValue(tokenValue);
             } catch (SpaceCrackUnauthorizedException ex) {
-                responseWrapper.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You are unauthorized for this request");
+                sendUnauthorized(responseWrapper);
             }
 
             if (token != null) {
@@ -68,11 +69,15 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
             }
         }
         if (unauthorized) {
-            responseWrapper.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You are unauthorized for this request");
+            sendUnauthorized(responseWrapper);
 
             return false;
         }
         return  true;
+    }
+
+    private void sendUnauthorized(HttpServletResponseWrapper responseWrapper) throws IOException {
+        responseWrapper.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You are unauthorized for this request");
     }
 
 

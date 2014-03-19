@@ -1,5 +1,5 @@
 var spaceApp = angular.module('spaceApp');
-spaceApp.controller("ActiveGamesController", function ($scope, $translate, Game, $location, Contact, GameInvite) {
+spaceApp.controller("ActiveGamesController", function ($scope, $translate, $timeout, Game, $location, Contact, GameInvite) {
 
     $scope.oneAtATime = true;
     $scope.goToGame = function (gameId) {
@@ -18,10 +18,13 @@ spaceApp.controller("ActiveGamesController", function ($scope, $translate, Game,
         }
     ];
 
-    Game.query(function (data) {
-        $scope.games = data;
-    });
-
+    function bindGames() {
+        Game.query(function (data) {
+            $scope.games = data;
+            $timeout(bindGames, 5000);
+        });
+    }
+    bindGames();
     $scope.getPlayersOrdered = function (game) {
         var players = [];
         if (game.player1.profileId == $scope.currentProfileId) {

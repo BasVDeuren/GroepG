@@ -119,6 +119,35 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void registerFacebookUser(String username, String password, String email)  {
+
+        User userByUsername = userRepository.getUserByUsername(username);
+        if(userByUsername != null)
+        {
+            throw new SpaceCrackAlreadyExistsException();
+        }
+
+        User userByEmail = userRepository.getUserByEmail(email);
+        if(userByEmail != null)
+        {
+            throw new SpaceCrackAlreadyExistsException();
+        }
+        User user = new User(username, password, email, true);
+
+        Profile profile = new Profile();
+
+
+        if(user.getProfile() == null){
+            profile.setUser(user);
+            user.setProfile(profile);
+            profileRepository.createProfile(profile);
+            userRepository.updateUser(user);
+
+        }
+        userRepository.createUser(user);
+    }
+
+    @Override
     public void updateUser(User user) {
         userRepository.updateUser(user);
     }

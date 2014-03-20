@@ -12,7 +12,7 @@ import be.kdg.spacecrack.viewmodels.GameViewModel;
 import java.util.List;
 
 public interface IGameService {
-    public static final int START_COMMAND_POINTS = 5;
+    public static final int START_COMMAND_POINTS = 8;
     public static final int COMMANDPOINTS_PER_TURN = START_COMMAND_POINTS;
     public static final int BUILDSHIP_COST = 3;
     public static final int MOVESHIPCOST = 1;

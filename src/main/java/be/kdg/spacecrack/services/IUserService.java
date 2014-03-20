@@ -18,6 +18,8 @@ public interface IUserService {
 
     void registerUser(String username, String password, String email) throws Exception;
 
+    void registerFacebookUser(String username, String password, String email);
+
     void updateUser(User user);
 
     List<User> getUsersByString(String username) throws Exception;

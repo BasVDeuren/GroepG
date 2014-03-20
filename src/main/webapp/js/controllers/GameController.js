@@ -138,7 +138,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             btnEndTurn.events.onInputDown.add(onClickEndTurn);
             btnEndTurn.fixedToCamera = true;
             btnEndTurn.cameraOffset.setTo(CANVASWIDTH / 2 - 92, CANVASHEIGHT - 83);
-            planetGroup.add(btnEndTurn);
+            miniShipGroup.add(btnEndTurn);
             var planetArray = data.planets;
 
             for (var planetKey in planetArray) {
@@ -364,10 +364,18 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
         }
 
         function drawColonies(gameData) {
-            for (var key in $scope.colonyXSpritesById) {
-                $scope.colonyXSpritesById[key].destroy();
-            }
+            colonyGroup.destroy(true);
+            colonyGroup = game.add.group();
+            colonyGroup.z = 1;
+//
+//            for (var key in $scope.colonyXSpritesById) {
+//                $scope.colonyXSpritesById[key].destroy();
+//            }
 
+            for(var key in $scope.planetXSpritesByLetter)
+            {
+                $scope.planetXSpritesByLetter[key].colonyXSprite = null;
+            }
             $scope.colonyXSpritesById = [];
             if(player2IsActive)
             {

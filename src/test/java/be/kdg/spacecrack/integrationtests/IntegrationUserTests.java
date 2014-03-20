@@ -115,7 +115,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
 
         assertEquals("Expect 'To' to be equal to the registered emailadress ", expectedEmail, mimeMessage.getRecipients(Message.RecipientType.TO)[0].toString());
         assertEquals("Expect Subject to be equal to 'SpaceCrack registration confirmation' ", "SpaceCrack registration confirmation", mimeMessage.getSubject());
-        assertEquals("Expect mail to start with 'dear usernameTest,' ", "Dear usernameTest,", content.substring(0, 18));
+        assertEquals("Expect mail to start with 'dear usernameTest,' ", "<p>Dear usernameTest,", content.substring(0, 21));
         String verificationCodeString = "verification code: ";
         int beginIndex = content.indexOf(verificationCodeString) + verificationCodeString.length();
         assertEquals("Expect mail to contain token testToken123", testToken, content.substring(beginIndex, beginIndex + testToken.length()) );

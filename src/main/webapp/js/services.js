@@ -101,4 +101,6 @@ angular.module('spaceServices', ['ngResource'])
         return $resource('/api/auth/invitation');
     }).factory('VerificationService', function($resource){
         return $resource('/api/verifiedUser');
+    }).factory('RegisterFbUser', function($resource){
+        return $resource('/api/fbuser')
     });

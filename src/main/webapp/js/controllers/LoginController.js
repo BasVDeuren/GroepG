@@ -1,7 +1,7 @@
 /**
  * Created by Atheesan on 4/02/14.
  */
-function LoginController($scope, Login, Register, $cookieStore, Spinner, Contact,$rootScope,md5) {
+function LoginController($scope, Login, $cookieStore, Spinner, Contact,$rootScope,md5,RegisterFbUser) {
 
     //data klaar zetten
     $scope.contactData = {
@@ -101,12 +101,13 @@ function LoginController($scope, Login, Register, $cookieStore, Spinner, Contact
             passwordRepeated: 'facebook' + response.id
         };
 
-        Register.save(user, function (data) {
+        RegisterFbUser.save(user, function (data) {
             Spinner.spinner.stop();
             $cookieStore.put('accessToken', data.value);
             $scope.updateFbProfile(response);
             $rootScope.loadInvites();
-            $scope.go('/');
+           // $scope.go('/');
+            $scope.fbLogin();
             $scope.alreadyRegistered = false;
         }, function () {
             Spinner.spinner.stop();

@@ -261,6 +261,8 @@ public class GameServiceTests extends BaseUnitTest {
         Ship ship = player.getShips().get(0);
         gameService.moveShip(ship.getShipId(), "b");
         gameService.moveShip(ship.getShipId(), "c");
+        gameService.moveShip(ship.getShipId(), "b");
+        gameService.moveShip(ship.getShipId(), "c");
         Colony colony = player.getColonies().get(0);
         gameService.buildShip(colony.getColonyId());
     }

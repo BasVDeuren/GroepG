@@ -53,6 +53,19 @@ public class UserController {
 
     }
 
+    @RequestMapping(value = "/fbuser", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public void registerFaceBookUser(@RequestBody @Valid UserViewModel userWrapper) throws Exception {
+
+        if (userWrapper.getPassword().equals(userWrapper.getPasswordRepeated())) {
+            userService.registerFacebookUser(userWrapper.getUsername(), userWrapper.getPassword(), userWrapper.getEmail());
+        } else {
+            throw new SpaceCrackNotAcceptableException("Password and repeat password aren't equal");
+        }
+
+
+    }
+
     @RequestMapping(value = "/auth/user", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public void editUser(@RequestBody UserViewModel userWrapper, @CookieValue("accessToken") String accessTokenValue) throws Exception {

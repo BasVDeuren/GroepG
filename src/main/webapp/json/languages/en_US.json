@@ -97,6 +97,7 @@
     "INVITED": "Invited",
     "ACTIVE":"Active",
     "PENDING":"Pending",
-    "STATE": "State"
+    "STATE": "State",
+    "CANCEL": "Cancel"
 
 }

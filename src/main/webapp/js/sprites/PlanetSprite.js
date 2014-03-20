@@ -10,7 +10,7 @@ var PlanetExtendedSprite = function (game, x, y, planet, planetListener) {
     Phaser.Sprite.call(this, game, x - width / 2, y - height / 2, 'planet1');
     this.planet = planet;
     this.inputEnabled = true;
-    this.body.immovable = true;
+
     this.events.onInputDown.add(planetListener, this);
     this.colonyXSprite = null;
 

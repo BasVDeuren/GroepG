@@ -80,4 +80,12 @@ spaceApp.controller("ActiveGamesController", function ($scope, $translate, $time
         });
     }
 
+    $scope.cancelPendingGame = function (game) {
+        GameInvite.delete({gameId: game.gameId}, function () {
+            Game.query(function (data) {
+                $scope.games = data;
+            });
+        });
+    }
+
 });

@@ -2,7 +2,8 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-default">
-                <table class="table table-hover table-condensed">
+                <p ng-hide="games.length">You don't have any games!</p>
+                <table ng-show="games.length" class="table table-hover table-condensed">
                     <thead>
                     <tr>
                         <th>{{'GAME' | translate}}</th>
@@ -11,7 +12,8 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody>
+
+                    <tbody >
                     <tr ng-repeat="game in games" ng-show="isActiveGame(game) && isNotEndedGame(game)">
                         <td>{{game.name}}</td>
                         <td>{{getPlayersOrdered(game)[1].playerName}}</td>
@@ -26,7 +28,11 @@
                         <td>{{game.name}}</td>
                         <td>{{getPlayersOrdered(game)[1].playerName}}</td>
                         <td>{{'PENDING' | translate}}</td>
-                        <td></td>
+                        <td  class="alignRight">
+                            <button class="btn btn-danger" name="btnDecline" type="button"
+                                    ng-click="cancelPendingGame(game)"><i class="fa fa-times"></i> {{'CANCEL' | translate}}
+                            </button>
+                        </td>
                     </tr>
                     <tr ng-repeat="game in games" ng-show="isInvitedGame(game)">
                         <td>{{game.name}}</td>

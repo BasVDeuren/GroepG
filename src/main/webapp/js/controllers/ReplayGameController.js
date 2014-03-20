@@ -2,8 +2,8 @@
  * Created by Tim on 10/03/14.
  */
 var spaceApp = angular.module('spaceApp');
-spaceApp.controller("ReplayGameController", function ($scope,$templateCache, $translate, Map, Game, Action, $route, $routeParams, ReplayGame) {
-        $templateCache.removeAll();
+spaceApp.controller("ReplayGameController", function ($scope, $templateCache, $translate, Map, Game, Action, $route, $routeParams, ReplayGame) {
+    $templateCache.removeAll();
 
 
     //region Declarations
@@ -126,7 +126,7 @@ spaceApp.controller("ReplayGameController", function ($scope,$templateCache, $tr
                 var connectedPlanets = planetXSprite.planet.connectedPlanets;
 
                 for (var cpKey in  connectedPlanets) {
-                    graphics.moveTo(planetXSprite.x + planetXSprite.center.x, planetXSprite.y + planetXSprite.center.y);
+                    graphics.moveTo(planetXSprite.x + 15, planetXSprite.y + 15);
                     var connectedPlanet = connectedPlanets[cpKey];
                     graphics.lineTo(connectedPlanet.x, connectedPlanet.y);
                 }
@@ -136,7 +136,7 @@ spaceApp.controller("ReplayGameController", function ($scope,$templateCache, $tr
 
     function resetGame() {
         var drawRevisions = setInterval(function () {
-            ReplayGame.getRevisionByRevisionNumber().get({gameId: $routeParams.gameId, revisionNumber: $scope.nextRevisionNumber}, applyGameData, function(){
+            ReplayGame.getRevisionByRevisionNumber().get({gameId: $routeParams.gameId, revisionNumber: $scope.nextRevisionNumber}, applyGameData, function () {
                 clearInterval(drawRevisions);
             });
         }, 800);
@@ -207,9 +207,8 @@ spaceApp.controller("ReplayGameController", function ($scope,$templateCache, $tr
                 var colony = colonies[colonyKey];
                 var colonyXSprite;
 
-                colonyXSprite = new ColonyExtendedSprite(game, colony, colony.planetName, player.playerId, image, colonyGroup, $scope.planetXSpritesByLetter, function () {
-                }, function () {
-                }, null);
+                colonyXSprite = new ColonyExtendedSprite(game, colony, colony.planetName, player.playerId, image, colonyGroup, $scope.planetXSpritesByLetter, function () {});
+
 
                 $scope.colonyXSpritesById[colony.colonyId] = colonyXSprite;
                 $scope.planetXSpritesByLetter[colony.planetName].colonyXSprite = colonyXSprite;

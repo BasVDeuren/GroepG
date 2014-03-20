@@ -96,5 +96,6 @@
     "INVITED": "Uitgenodigd",
     "ACTIVE":"Bezig",
     "PENDING":"In afwachting",
-    "STATE": "Status"
+    "STATE": "Status",
+    "CANCEL": "Annuleren"
 }

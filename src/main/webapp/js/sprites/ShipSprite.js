@@ -5,14 +5,14 @@ var ShipExtendedSprite = function (game, ship, playerId, image, spaceshipListene
     var planet = planetXSpritesByLetter[ship.planetName].planet;
     Phaser.Sprite.call(this, game, planet.x, planet.y - 15, image);
     shipGroup.add(this);
-    var text = game.add.text(34, -5, ship.strength, {font: '20px Arial', fill: '#FF0000'});
+    var text = game.add.text(34, -5, ship.strength+'', {font: '20px Arial', fill: '#FF0000'});
     this.addChild(text);
 
     this.ship = ship;
     this.playerId = playerId;
 
     this.inputEnabled = true;
-    this.body.immovable = true;
+
 
     text.setText(this.ship.strength);
 

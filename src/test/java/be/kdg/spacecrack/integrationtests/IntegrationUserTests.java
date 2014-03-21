@@ -94,7 +94,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
         MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
-        stub(mockTokenStringGenerator.generateTokenString()).toReturn(testToken);
+        stub(mockTokenStringGenerator.generateTokenString(6)).toReturn(testToken);
 
         mockMvcStandalone.perform(postRequestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
@@ -183,7 +183,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
         MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
-        stub(mockTokenStringGenerator.generateTokenString()).toReturn(testToken);
+        stub(mockTokenStringGenerator.generateTokenString(32)).toReturn(testToken);
         stub(mockUserRepository.findUserByVerificationTokenValue(testToken)).toReturn(new User());
 
          mockMvcStandalone.perform(postRequestBuilder
@@ -218,7 +218,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
         MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
-        stub(mockTokenStringGenerator.generateTokenString()).toReturn(testToken);
+        stub(mockTokenStringGenerator.generateTokenString(32)).toReturn(testToken);
         String invalidtoken = "invalidtoken";
         stub(mockUserRepository.findUserByVerificationTokenValue(invalidtoken)).toReturn(null);
 

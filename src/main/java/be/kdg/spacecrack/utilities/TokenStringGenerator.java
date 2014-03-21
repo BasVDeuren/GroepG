@@ -25,7 +25,7 @@ public class TokenStringGenerator implements ITokenStringGenerator {
     }
 
     @Override
-    public String generateTokenString() {
-        return new BigInteger(130, random ).toString(32);
+    public String generateTokenString(int length) {
+        return new BigInteger(130*length/32, random ).toString(32);
     }
 }

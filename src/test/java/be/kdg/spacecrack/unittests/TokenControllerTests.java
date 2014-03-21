@@ -67,7 +67,7 @@ public class TokenControllerTests extends BaseUnitTest{
         String pw = "testPassword2";
         User user = new User(name, pw, email, true);
         String expectedTokenValue = "testtokenvalue1234";
-        Mockito.stub(mockTokenGenerator.generateTokenString()).toReturn(expectedTokenValue);
+        Mockito.stub(mockTokenGenerator.generateTokenString(32)).toReturn(expectedTokenValue);
         AccessToken token = tokenControllerWithMockedGenerator.login(user);
 
 
@@ -86,7 +86,7 @@ public class TokenControllerTests extends BaseUnitTest{
         String pw = "testPassword2";
         User user = new User(name, pw, email, true);
         String expectedTokenValue = "testtokenvalue1234";
-        Mockito.stub(mockTokenGenerator.generateTokenString()).toReturn(expectedTokenValue);
+        Mockito.stub(mockTokenGenerator.generateTokenString(32)).toReturn(expectedTokenValue);
         AccessToken token = tokenControllerWithMockedGenerator.login(user);
 
 

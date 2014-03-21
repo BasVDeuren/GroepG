@@ -78,12 +78,12 @@ function fbLogin() {
 //}
 
 
-//function getUser() {
-//    //Get info about the current logged in user
-//    FB.api('/me', function(response) {
+function getUser() {
+    //Get info about the current logged in user
+    FB.api('/me', function(response) {
 //        alert("Welkom " + response.name + ", je email adres is: " +  response.email);
-//    });
-//}
+    });
+}
 
 
 //window.fbAsyncInit = function() {

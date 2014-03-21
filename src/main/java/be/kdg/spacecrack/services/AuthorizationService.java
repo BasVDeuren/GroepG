@@ -88,7 +88,7 @@ public class AuthorizationService implements IAuthorizationService {
         AccessToken accessToken = dbUser.getToken();
 
         if (accessToken == null) {
-            String tokenvalue = tokenStringGenerator.generateTokenString();
+            String tokenvalue = tokenStringGenerator.generateTokenString(32);
             accessToken = new AccessToken(tokenvalue);
             accessToken.setUser(dbUser);
             dbUser.setToken(accessToken);

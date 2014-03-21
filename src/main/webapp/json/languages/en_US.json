@@ -98,6 +98,8 @@
     "ACTIVE":"Active",
     "PENDING":"Pending",
     "STATE": "State",
-    "CANCEL": "Cancel"
-
+    "CANCEL": "Cancel",
+    "TURNSTATE":"Turn state",
+    "TURNENDEDSTATE":"ended",
+    "TURNBUSYSTATE": "busy"
 }

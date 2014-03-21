@@ -85,7 +85,7 @@ public class UserService implements IUserService {
         Profile profile = new Profile();
         profile.setUser(user);
         user.setProfile(profile);
-        user.setVerificationToken(tokenStringGenerator.generateTokenString());
+        user.setVerificationToken(tokenStringGenerator.generateTokenString(6));
         userRepository.createUser(user);
         MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
         try {

@@ -55,37 +55,41 @@ function LoginController($scope, Login, $cookieStore, Spinner, Contact,$rootScop
         return !($scope.loginData.email != '' && $scope.loginData.password != '');
     };
 
-    $scope.fbLogin = function () {
-        FB.login(function (response) {
-            if (response.authResponse) {
+    $scope.facebookLogin = function () {
+        FB.login(function (fbLoginResponse) {
+            if (fbLoginResponse.authResponse) {
                 var user;
-                console.log(response);
-                FB.api('/me', function (response) {
-                    console.log(response);
-                    $scope.contactData.dayOfBirth = new Date(response.birthday).toLocaleDateString();
-                    FB.api("/me/picture", function (response) {
-                        console.log(response);
-                        $scope.contactData.image = response.data.url;
+                console.log(fbLoginResponse);
+                FB.api('/me', function (meResponse) {
+                    console.log(meResponse);
+                    $scope.contactData.dayOfBirth = new Date(meResponse.birthday).toLocaleDateString();
+                    FB.api("/me/picture", function (pictureResponse) {
+                        console.log(pictureResponse);
+                        if(pictureResponse.data != undefined)
+                        {
+                            $scope.contactData.image = pictureResponse.data.url;
+                        }
+
                     });
                     user = {
-                        email: response.email,
-                        password: 'facebook' + response.id
+                        email: meResponse.email,
+                        password: 'facebook' + meResponse.id
                     };
                     Spinner.spinner.spin(Spinner.target);
                     Login.save(user, function (data) {
                         Spinner.spinner.stop();
                         $cookieStore.put('accessToken', data.value);
-                        $scope.updateFbProfile(response);
+                        $scope.updateFbProfile(meResponse);
                         $rootScope.loadInvites();
                         $scope.go('/');
                         $scope.hasLoginFailed = false;
                     }, function () {
                         Spinner.spinner.stop();
-                        $scope.registerFB(response);
+                        $scope.registerFB(meResponse);
                     });
                 });
             } else {
-//                    Spinner.spinner.stop();
+                    Spinner.spinner.stop();
                 console.log('User cancelled login or did not fully authorize.');
             }
         }, {scope: 'email, user_birthday, user_photos, read_friendlists'});
@@ -107,7 +111,7 @@ function LoginController($scope, Login, $cookieStore, Spinner, Contact,$rootScop
             $scope.updateFbProfile(response);
             $rootScope.loadInvites();
            // $scope.go('/');
-            $scope.fbLogin();
+            $scope.facebookLogin();
             $scope.alreadyRegistered = false;
         }, function () {
             Spinner.spinner.stop();

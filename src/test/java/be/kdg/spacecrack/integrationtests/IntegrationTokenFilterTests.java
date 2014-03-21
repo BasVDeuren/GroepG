@@ -51,7 +51,7 @@ public class IntegrationTokenFilterTests extends BaseFilteredIntegrationTests {
 
     @Test
     public void getAuthUser_InvalidToken_Unauthorized() throws Exception {
-        String invalidTokenValue = new TokenStringGenerator(1235).generateTokenString();
+        String invalidTokenValue = new TokenStringGenerator(1235).generateTokenString(32);
         AccessToken invalidToken = new AccessToken(invalidTokenValue);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder

@@ -22,7 +22,9 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     var xExtraByCamera;
     var yExtraByCamera;
     var firebaseGameRef;
-    var commandPointsText;
+    var player1CommandPointsText;
+    var player2CommandPointsText;
+
     var p;
 
     var lineGroup;
@@ -36,11 +38,18 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     $scope.planetXSpritesByLetter = [];
     $scope.colonyXSpritesById = [];
     $scope.selectedSpaceShipXSprite = null;
-    $scope.commandPoints = 0;
+    $scope.player1CommandPoints = 0;
+
+    $scope.player2CommandPoints = 0;
+    $scope.activePlayerCommandPoints = 0;
     var oldTurnEnded = true;
-    $scope.isTurnEnded = true;
+    $scope.player1IsTurnEnded = true;
+    $scope.player2IsTurnEnded = true;
+    $scope.activePlayerIsTurnEnded = true;
     var otherTurnEnded = true;
     var oldOtherTurnEnded = true;
+    var player1TurnEndedText;
+    var player2TurnEndedText;
     $scope.activePlayerMiniShipImage = null;
 
     $scope.game = {
@@ -77,10 +86,27 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
         drawGame();
         buttonGroup = game.add.group();
 
-        var commandpointsprite = game.add.sprite(0, 0);
-        commandpointsprite.fixedToCamera = true;
-        commandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS')+ ": ", { font: '20px Arial', fill: '#FF0000'});
-        commandpointsprite.addChild(commandPointsText);
+
+        var Player1CommandPointsSprite = game.add.sprite(0, 0);
+        Player1CommandPointsSprite.fixedToCamera = true;
+        player1CommandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        Player1CommandPointsSprite.addChild(player1CommandPointsText);
+
+        var player2CommandPointsSprite = game.add.sprite(0, 0);
+        player2CommandPointsSprite.fixedToCamera = true;
+        player2CommandPointsText = game.add.text(CANVASWIDTH-220, 5, $translate('COMMANDPOINTS')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2CommandPointsSprite.addChild(player2CommandPointsText);
+
+
+        var player1TurnEndedSprite = game.add.sprite(0, 0);
+        player1TurnEndedSprite.fixedToCamera = true;
+        player1TurnEndedText = game.add.text(5,35, $translate('TURNSTATE')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player1TurnEndedSprite.addChild(player1TurnEndedText);
+
+        var player2TurnEndedSprite = game.add.sprite(0, 0);
+        player2TurnEndedSprite.fixedToCamera = true;
+        player2TurnEndedText = game.add.text(CANVASWIDTH-180,35, $translate('TURNSTATE')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2TurnEndedSprite.addChild(player2TurnEndedText);
     }
 
     function update() {
@@ -207,8 +233,8 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
 
 
     function miniShipListener(miniShipXSprite) {
-        if (!$scope.isTurnEnded) {
-            if ($scope.commandPoints >= BUILDSHIPCOST) {
+        if (!$scope.activePlayerIsTurnEnded) {
+            if ($scope.activePlayerCommandPoints >= BUILDSHIPCOST) {
                 var action = {
                     gameId: $scope.game.gameId,
                     actionType: "BUILDSHIP",
@@ -237,7 +263,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
 
     function planetListener(planetXSprite) {
         if (planetXSprite.isEligibleMove()) {
-            if (!$scope.isTurnEnded) {
+            if (!$scope.activePlayerIsTurnEnded) {
                 var cost;
                 if (planetXSprite.colonyXSprite != null) {
                     if (planetXSprite.colonyXSprite.playerId == $scope.game.activePlayerId) {
@@ -248,7 +274,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
                 } else {
                     cost = COLONIZECOST;
                 }
-                if ($scope.commandPoints >= cost) {
+                if ($scope.activePlayerCommandPoints >= cost) {
 
                     allPlanetsNormal();
 
@@ -299,19 +325,23 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     function applyGameData(gameData) {
         $scope.game.gameId = gameData.gameId;
 
+        $scope.player1CommandPoints = gameData.player1.commandPoints;
+        $scope.player2CommandPoints = gameData.player2.commandPoints;
+        $scope.player1IsTurnEnded = gameData.player1.turnEnded;
+        $scope.player2IsTurnEnded = gameData.player2.turnEnded;
         var player1IsActive = false;
         var player2IsActive = false;
 
-        oldTurnEnded = $scope.isTurnEnded;
+        oldTurnEnded = $scope.activePlayerIsTurnEnded;
         oldOtherTurnEnded = otherTurnEnded;
         if ($scope.game.activePlayerId == gameData.player1.playerId) {
             $scope.game.opponentPlayerId = gameData.player2.playerId;
             $scope.game.opponentPlayerColonyImage = 'player2castle';
             $scope.game.activePlayerColonyImage = 'player1castle';
             $scope.activePlayerMiniShipImage = 'miniplayer1spaceship';
-            $scope.commandPoints = gameData.player1.commandPoints;
+            $scope.activePlayerCommandPoints = $scope.player1CommandPoints;
 
-            $scope.isTurnEnded = gameData.player1.turnEnded;
+            $scope.activePlayerIsTurnEnded = gameData.player1.turnEnded;
             otherTurnEnded = gameData.player2.turnEnded;
 
             player1IsActive= true;
@@ -320,19 +350,21 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             $scope.game.opponentPlayerColonyImage = 'player1castle';
             $scope.game.activePlayerColonyImage = 'player2castle';
             $scope.activePlayerMiniShipImage = 'miniplayer2spaceship';
-            $scope.commandPoints = gameData.player2.commandPoints;
-            $scope.isTurnEnded = gameData.player2.turnEnded;
+            $scope.activePlayerCommandPoints = $scope.player2CommandPoints;
+
+            $scope.activePlayerIsTurnEnded = gameData.player2.turnEnded;
             otherTurnEnded = gameData.player1.turnEnded;
             player2IsActive = true;
 
         }
         if(oldOtherTurnEnded || oldTurnEnded  )
         {
-            if(!$scope.isTurnEnded && !otherTurnEnded )
+            if(!$scope.activePlayerIsTurnEnded && !otherTurnEnded )
             {
                 showNotification($translate('TURNHASBEGUN'))
             }
         }
+
         drawShips(gameData);
         drawColonies(gameData);
         updateCommandPoints();
@@ -357,7 +389,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             btnEndTurn.visible = false;
             btnEndTurn.inputEnabled = false;
         } else {
-            btnEndTurn.visible = !$scope.isTurnEnded;
+            btnEndTurn.visible = !$scope.activePlayerIsTurnEnded;
         }
 
         function drawShips(gameData) {
@@ -434,15 +466,20 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     }
 
     function updateCommandPoints() {
-        commandPointsText.setText($translate('COMMANDPOINTS')+ ": " + $scope.commandPoints);
+        player1CommandPointsText.setText($translate('COMMANDPOINTS')+ ": " + $scope.player1CommandPoints);
+
+        player2CommandPointsText.setText($translate('COMMANDPOINTS')+ ": " + $scope.player2CommandPoints);
+        player1TurnEndedText.setText($translate('TURNSTATE')+ ": " + ($scope.player1IsTurnEnded ? $translate('TURNENDEDSTATE'): $translate('TURNBUSYSTATE')));
+        player2TurnEndedText.setText($translate('TURNSTATE')+ ": " + ($scope.player2IsTurnEnded ? $translate('TURNENDEDSTATE'): $translate('TURNBUSYSTATE')));
+
     }
 
     function showNotification(string) {
         var sprite = game.add.sprite(0, 0);
-        var text = game.add.text(5, 5, string, { font: '20px Arial', fill: '#FF0000'});
+        var text = game.add.text(5, 5, string, { font: '20px Arial', fill: '#FF0000', align: "center"});
         sprite.addChild(text);
         sprite.fixedToCamera = true;
-        sprite.cameraOffset.setTo(CANVASWIDTH / 2 - text.width / 2, CANVASHEIGHT / 2 - text.height / 2);
+        sprite.cameraOffset.setTo(CANVASWIDTH / 2, CANVASHEIGHT / 2);
 
         setTimeout(function () {
             sprite.destroy();

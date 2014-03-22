@@ -140,14 +140,15 @@ public class GameService implements IGameService {
     @Override
     public void endTurn(Integer playerID) {
         Player player = playerRepository.getPlayerByPlayerId(playerID);
-        Game game = gameRepository.getGameForUpdate(player.getGame());
+        Game game = gameRepository.getGameByGameId(player.getGame().getGameId());
+        Integer oldActionNumber = game.getActionNumber();
 
 
         if (!player.isTurnEnded()) {
-            int commandPoints = player.getCommandPoints();
-            player.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
-            player.setTurnEnded(true);
 
+//            player.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
+//            player.setTurnEnded(true);
+            player.setTurnEnded(true);
             boolean allTurnsEnded = true;
             List<Player> players = game.getPlayers();
             for (Player p : players) {
@@ -157,6 +158,8 @@ public class GameService implements IGameService {
             }
             if (allTurnsEnded) {
                 for (Player p : players) {
+                    int commandPoints = p.getCommandPoints();
+                    p.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
                     p.setTurnEnded(false);
 
                 }
@@ -164,7 +167,7 @@ public class GameService implements IGameService {
         } else {
             throw new SpaceCrackNotAcceptableException("Turn is already ended");
         }
-        gameSynchronizer.updateGame(game);
+        gameSynchronizer.updateGameConcurrent(game, oldActionNumber);
     }
 
     @Override

@@ -12,8 +12,10 @@ import be.kdg.spacecrack.model.Profile;
 import be.kdg.spacecrack.repositories.GameRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,6 +27,18 @@ public class GameRepositoryTests extends BaseUnitTest {
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     SessionFactory sessionFactory;
+
+    private GameRepository gameRepository;
+
+
+    @Autowired
+    HibernateTransactionManager transactionManager;
+
+    @Before
+    public void setUp() throws Exception {
+        gameRepository =new GameRepository(sessionFactory);
+
+    }
 
     @Test
     @Transactional
@@ -82,10 +96,47 @@ public class GameRepositoryTests extends BaseUnitTest {
         expected.getPlayers().add(player2);
         session.saveOrUpdate(expected);
 
-        GameRepository gameRepository = new GameRepository(sessionFactory);
+
         int expectedId = gameRepository.createOrUpdateGame(expected);
         Game actual = gameRepository.getGameByGameId(expectedId);
 
         assertEquals("GameId from repository should be the same as actual gameId", expectedId, actual.getGameId());
     }
+
+//    @Test
+//    @Transactional
+//    public void updateGameOptimisticConcurrency() throws Exception {
+//
+//        TransactionStatus createTransaction = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW));
+//
+//        Game initialGame = new Game();
+//       // int gameId = 20;
+//       // initialGame.setGameId(gameId);
+//        initialGame.setActionNumber(0);
+//        gameRepository.createOrUpdateGame(initialGame);
+//        transactionManager.commit(createTransaction);
+//        TransactionStatus readTransaction = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW));
+//
+//        Game updatedGame = gameRepository.getGameByGameId(initialGame.getGameId());
+//        transactionManager.commit(readTransaction);
+//        TransactionStatus update1Transaction = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW));
+//
+//        Game concurrentGamev2 = updatedGame;
+//        Integer oldActionNumber = updatedGame.getActionNumber();
+//        updatedGame.setName("derp");
+//        concurrentGamev2.setName("herp");
+//
+//
+//        boolean shouldbetrue = gameRepository.updateGameOptimisticConcurrent(updatedGame, oldActionNumber);
+//
+//        assertTrue(shouldbetrue);
+//        transactionManager.commit(update1Transaction);
+//
+//        TransactionStatus concurrentUpdateTransaction = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRES_NEW));
+//
+//        boolean shouldbefalse = gameRepository.updateGameOptimisticConcurrent(concurrentGamev2, oldActionNumber);
+//        assertFalse(shouldbefalse);
+//        transactionManager.commit(concurrentUpdateTransaction);
+//
+//    }
 }

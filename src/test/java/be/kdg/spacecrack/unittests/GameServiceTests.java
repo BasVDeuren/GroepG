@@ -198,11 +198,13 @@ public class GameServiceTests extends BaseUnitTest {
 
         Game game = createGame();
         Player player = game.getPlayers().get(0);
+        Player player2 = game.getPlayers().get(1);
         int oldCommandPoints = player.getCommandPoints();
         gameService.endTurn(player.getPlayerId());
+       // gameService.endTurn(player2.getPlayerId());
         player = playerRepository.getPlayerByPlayerId(player.getPlayerId());
 
-        assertEquals(oldCommandPoints + GameService.COMMANDPOINTS_PER_TURN, player.getCommandPoints());
+        assertEquals(oldCommandPoints, player.getCommandPoints());
         gameService.moveShip(player.getShips().get(0).getShipId(), "b");
     }
 

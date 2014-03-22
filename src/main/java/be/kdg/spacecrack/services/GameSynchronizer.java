@@ -33,8 +33,26 @@ public class GameSynchronizer implements IGameSynchronizer {
 
     @Override
     public void updateGame(Game game) {
+        gameRepository.updateGame(game);
         GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
         firebaseUtil.setValue(GameController.GAMESUFFIX + gameViewModel.getGameId(), gameViewModel);
-        gameRepository.updateGame(game);
+
+    }
+
+    @Override
+    public void updateGameConcurrent(Game game, Integer actionNumber) {
+        boolean success = gameRepository.updateGameOptimisticConcurrent(game, actionNumber);
+        GameViewModel firebaseResult;
+        if (success) {
+            firebaseResult = viewModelConverter.convertGameToViewModel(game);
+        } else {
+            Game gameFromDb = gameRepository.getGameByGameId(game.getGameId());
+            firebaseResult = viewModelConverter.convertGameToViewModel(gameFromDb);
+        }
+
+
+        firebaseUtil.setValue(GameController.GAMESUFFIX + firebaseResult.getGameId(), firebaseResult);
+
+
     }
 }

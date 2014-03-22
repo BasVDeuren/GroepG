@@ -105,6 +105,26 @@ public class GameRepository implements IGameRepository {
     }
 
     @Override
+    public boolean updateGameOptimisticConcurrent(Game game, Integer actionNumber) {
+        Session session = sessionFactory.getCurrentSession();
+        //noinspection JpaQlInspection
+        Query query = session.createQuery(" from Game g where g.gameId = :gameId and g.actionNumber = :oldActionNumber  ");
+        query.setParameter("oldActionNumber", actionNumber);
+        query.setParameter("gameId", game.getGameId());
+        List resultObject = query.list();
+        Integer result = resultObject.size();
+    if(result == 0 )
+    {
+        return false;
+    }else{
+        game.incrementActionNumber();
+        session.update(game);
+    }
+
+    return true;
+}
+
+    @Override
     public void deleteGame(int gameId) {
         Session session = sessionFactory.getCurrentSession();
 

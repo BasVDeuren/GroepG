@@ -21,6 +21,8 @@ public interface IGameRepository {
 
     Game getGameByGameId(int gameId);
 
+    boolean updateGameOptimisticConcurrent(Game game, Integer actionNumber);
+
     void deleteGame(int gameId);
 
     Game getGameRevision(Number number, int gameId);
@@ -28,4 +30,6 @@ public interface IGameRepository {
     List<Integer> getRevisionNumbers(int gameId);
 
     Game getGameForUpdate(Game game);
+
+
 }

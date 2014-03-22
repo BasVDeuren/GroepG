@@ -7,4 +7,8 @@ import be.kdg.spacecrack.model.Game;
  */
 public interface IGameSynchronizer {
     void updateGame(Game game);
+
+
+
+    void updateGameConcurrent(Game game, Integer actionNumber);
 }

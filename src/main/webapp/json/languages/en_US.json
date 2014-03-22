@@ -1,6 +1,7 @@
 {
     "HELLO_WORLD": "Hello World!",
     "LOGIN": "Login",
+    "LOGOUT": "Log out",
     "USERNAME": "Username",
     "PASSWORD": "Password",
     "CHANGE_PASSWORD":"Change password",
@@ -101,5 +102,17 @@
     "CANCEL": "Cancel",
     "TURNSTATE":"Turn state",
     "TURNENDEDSTATE":"ended",
-    "TURNBUSYSTATE": "busy"
+    "TURNBUSYSTATE": "busy",
+    "LOBBY": "Lobby",
+    "NOGAMESPLACEHOLDER": "You have no games!",
+    "CLOSE": "Close",
+    "INVITES": "Invites",
+    "INVITEDYOU" : " invited you.",
+"MESSAGES" : "Messages",
+    "ACCEPTED_YOUR_INVITE": " accepted your invite.",
+    "GAMEINFO" : "Game info",
+    "WINRATIO":"Win ratio",
+    "NUMBER_OF_GAMES_PLAYED": "# Games played",
+    "AVERAGE_AMOUNT_OF_COLONIES_PER_WIN": "Colonies per win",
+    "AVERAGE_AMOUNT_OF_SHIPS_PER_WIN": "Ships per win"
 }

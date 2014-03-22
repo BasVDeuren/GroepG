@@ -1,11 +1,11 @@
 <div class="popover" ng-controller="NavHomeController">
     <div class="arrow"></div>
-    <h3 class="popover-title"><strong>Invites</strong></h3>
+    <h3 class="popover-title"><strong>{{'INVITES' | translate}}</strong></h3>
 
     <div class="popover-content inviteContent">
         <table class="table table-hover">
             <tr ng-repeat="i in userInvites" ng-hide="i.accepted">
-                <td><strong>{{i.inviter}}</strong> invited you</td>
+                <td><strong>{{i.inviter}}</strong>{{'INVITEDYOU' | translate}}</td>
                 <td ng-hide="i.accepted">
                     <button class="btn btn-success btn-sm" ng-click="acceptInvite(i)"><i
                             class="fa fa-check"></i></button>

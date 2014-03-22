@@ -14,7 +14,7 @@ spaceApp.controller("StatisticsController", function ($scope, $translate, Statis
     StatisticsService.get(function (data) {
         $scope.statistics = data;
         var DataStats = {
-            labels: ["Win Ratio: " + $scope.statistics.winRatio , "Number of Games: " +$scope.statistics.amountOfGames, "average Colonies per win: " + $scope.statistics.averageAmountOfColoniesPerWin, "average Ships per win: " + $scope.statistics.averageAmountOfShipsPerWin],
+            labels: [$translate('WINRATIO') +": "+ $scope.statistics.winRatio , $translate('NUMBER_OF_GAMES_PLAYED') +": "+$scope.statistics.amountOfGames, $translate('AVERAGE_AMOUNT_OF_COLONIES_PER_WIN')+": " + $scope.statistics.averageAmountOfColoniesPerWin, $translate('AVERAGE_AMOUNT_OF_SHIPS_PER_WIN') +": "+ $scope.statistics.averageAmountOfShipsPerWin],
             datasets: [
                 {
                     fillColor : "rgba(255,0,0,0.5)",
@@ -36,6 +36,6 @@ spaceApp.controller("StatisticsController", function ($scope, $translate, Statis
         };
 
         var ctx = document.getElementById("myChart").getContext("2d");
-        new Chart(ctx).Radar(DataStats, options);
+        new Chart(ctx).Bar(DataStats, options);
     })
 });

@@ -1,14 +1,21 @@
 <div class="container pagecontainer">
+
     <div class="row">
-        <p class="col-md-12">{{ARROWS | translate}}</p>
+        <div class="panel-title col-md-2 center-block">
+            <h1>{{gameName}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <p class="col-md-12">{{'ARROWS' | translate}}</p>
     </div>
     <div class="row">
         <div class="col-md-9">
-            <div class="label-info">{{'gameName'}}</div>
+
             <div id="game">
             </div>
         </div>
-        <div class="col-md-2 col-md-offset-1"  id="gameChat" ng-controller="ChatController">
+
+        <div class="col-md-2 col-md-offset-1" id="gameChat" ng-controller="ChatController">
             <div class="panel panel-default" id="chatPanel">
                 <div class="panel-heading">
                     Chat
@@ -34,6 +41,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
 

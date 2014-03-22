@@ -1,11 +1,11 @@
 <div class="popover" ng-controller="NavHomeController">
     <div class="arrow"></div>
-    <h3 class="popover-title"><strong>Messages</strong></h3>
+    <h3 class="popover-title"><strong>{{'MESSAGES' | translate}}</strong></h3>
 
     <div class="popover-content inviteContent">
         <table class="table table-hover">
             <tr ng-repeat="i in userMessages">
-                <td><strong>{{i.sender}}</strong> accepted your invite</td>
+                <td><strong>{{i.sender}}</strong> {{'ACCEPTED_YOUR_INVITE' | translate}}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" ng-click="go('/spacecrack/game/' + i.gameId)"><i
                             class="fa fa-chevron-circle-right"></i></button>

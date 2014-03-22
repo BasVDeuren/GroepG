@@ -1,6 +1,7 @@
 {
     "HELLO_WORLD": "Hallo Wereld!",
     "LOGIN": "Aanmelden",
+    "LOGOUT": "Uitloggen",
     "USERNAME": "Gebruikersnaam",
     "PASSWORD": "Wachtwoord",
     "CHANGE_PASSWORD":"Wachtwoord veranderen",
@@ -100,5 +101,17 @@
     "CANCEL": "Annuleren",
     "TURNSTATE":"Beurt status",
     "TURNENDEDSTATE":"beëindigd",
-    "TURNBUSYSTATE": "bezig"
+    "TURNBUSYSTATE": "bezig",
+    "LOBBY": "Lobby",
+    "NOGAMESPLACEHOLDER": "Je hebt geen spellen!",
+    "CLOSE": "Annuleren",
+    "INVITES": "Uitnodigingen",
+    "INVITEDYOU" : " heeft je uitgenodigd.",
+    "MESSAGES" : "Berichten",
+    "ACCEPTED_YOUR_INVITE": " heeft je uitnodiging geaccepteerd.",
+    "GAMEINFO": "Spel informatie",
+    "WINRATIO":"Win ratio",
+    "NUMBER_OF_GAMES_PLAYED": "# Gespeelde spellen",
+    "AVERAGE_AMOUNT_OF_COLONIES_PER_WIN": "Kolonies per win",
+    "AVERAGE_AMOUNT_OF_SHIPS_PER_WIN": "Schepen per win"
 }

@@ -52,6 +52,10 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
     var player1TurnEndedText;
     var player2TurnEndedText;
     $scope.activePlayerMiniShipImage = null;
+    var player1CommandPointsSprite;
+    var player2CommandPointsSprite;
+    var player1TurnEndedSprite;
+    var player2TurnEndedSprite;
 
     $scope.game = {
         gameId: "",
@@ -86,28 +90,28 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
         game.world.setBounds(0, 0, 1780, 1000);
         cursors = game.input.keyboard.createCursorKeys();
         drawGame();
-        buttonGroup = game.add.group();
 
 
-        var Player1CommandPointsSprite = game.add.sprite(0, 0);
-        Player1CommandPointsSprite.fixedToCamera = true;
-        player1CommandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#FF0000'});
-        Player1CommandPointsSprite.addChild(player1CommandPointsText);
 
-        var player2CommandPointsSprite = game.add.sprite(0, 0);
+        player1CommandPointsSprite = game.add.sprite(0, 0);
+        player1CommandPointsSprite.fixedToCamera = true;
+        player1CommandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#33CCFF'});
+        player1CommandPointsSprite.addChild(player1CommandPointsText);
+
+        player2CommandPointsSprite = game.add.sprite(0, 0);
         player2CommandPointsSprite.fixedToCamera = true;
-        player2CommandPointsText = game.add.text(CANVASWIDTH - 220, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2CommandPointsText = game.add.text(CANVASWIDTH - 220, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#9933FF'});
         player2CommandPointsSprite.addChild(player2CommandPointsText);
 
 
-        var player1TurnEndedSprite = game.add.sprite(0, 0);
+        player1TurnEndedSprite = game.add.sprite(0, 0);
         player1TurnEndedSprite.fixedToCamera = true;
-        player1TurnEndedText = game.add.text(5, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#FF0000'});
+        player1TurnEndedText = game.add.text(5, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#33CCFF'});
         player1TurnEndedSprite.addChild(player1TurnEndedText);
 
-        var player2TurnEndedSprite = game.add.sprite(0, 0);
+        player2TurnEndedSprite = game.add.sprite(0, 0);
         player2TurnEndedSprite.fixedToCamera = true;
-        player2TurnEndedText = game.add.text(CANVASWIDTH - 180, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2TurnEndedText = game.add.text(CANVASWIDTH - 220, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#9933FF'});
         player2TurnEndedSprite.addChild(player2TurnEndedText);
     }
 
@@ -127,7 +131,10 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
 
         if (btnEndTurn != undefined) {
             btnEndTurn.bringToTop();
-
+            player1TurnEndedSprite.bringToTop();
+            player1CommandPointsSprite.bringToTop();
+            player2TurnEndedSprite.bringToTop();
+            player2CommandPointsSprite.bringToTop();
         }
 
     }
@@ -466,7 +473,6 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
 
     function updateCommandPoints() {
         player1CommandPointsText.setText($translate('COMMANDPOINTS') + ": " + $scope.player1CommandPoints);
-
         player2CommandPointsText.setText($translate('COMMANDPOINTS') + ": " + $scope.player2CommandPoints);
         player1TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player1IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));
         player2TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player2IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));

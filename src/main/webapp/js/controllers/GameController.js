@@ -2,7 +2,7 @@
  * Created by Tim on 24/02/14.
  */
 var spaceApp = angular.module('spaceApp');
-spaceApp.controller("GameController", function ($scope,$templateCache, $translate, Map, Game, Action, ActiveGame, $route, $routeParams, Spinner) {
+spaceApp.controller("GameController", function ($scope, $templateCache, $translate, Map, Game, Action, ActiveGame, $route, $routeParams, Spinner) {
     $templateCache.removeAll();
 
     //region Declarations
@@ -39,6 +39,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     $scope.colonyXSpritesById = [];
     $scope.selectedSpaceShipXSprite = null;
     $scope.player1CommandPoints = 0;
+    $scope.gameName = "";
 
     $scope.player2CommandPoints = 0;
     $scope.activePlayerCommandPoints = 0;
@@ -65,8 +66,8 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
 
 //region Lifecycle Methods
     function preload() {
-     //   game.load.image('bg', 'assets/SpaceCrackBackground.jpg');
-        game.load.spritesheet('button', 'assets/'+$translate('BUTTON')+'.png', 193, 71);
+        //   game.load.image('bg', 'assets/SpaceCrackBackground.jpg');
+        game.load.spritesheet('button', 'assets/' + $translate('BUTTON') + '.png', 193, 71);
         game.load.image('planet1', 'assets/planet1_small.png');
         game.load.image('planet1_selected', 'assets/planet1_small_selected.png');
         game.load.image('player1spaceship', 'assets/player1spaceship.png');
@@ -81,6 +82,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     }
 
     function create() {
+
         game.world.setBounds(0, 0, 1780, 1000);
         cursors = game.input.keyboard.createCursorKeys();
         drawGame();
@@ -89,23 +91,23 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
 
         var Player1CommandPointsSprite = game.add.sprite(0, 0);
         Player1CommandPointsSprite.fixedToCamera = true;
-        player1CommandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player1CommandPointsText = game.add.text(5, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#FF0000'});
         Player1CommandPointsSprite.addChild(player1CommandPointsText);
 
         var player2CommandPointsSprite = game.add.sprite(0, 0);
         player2CommandPointsSprite.fixedToCamera = true;
-        player2CommandPointsText = game.add.text(CANVASWIDTH-220, 5, $translate('COMMANDPOINTS')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2CommandPointsText = game.add.text(CANVASWIDTH - 220, 5, $translate('COMMANDPOINTS') + ": ", { font: '20px Arial', fill: '#FF0000'});
         player2CommandPointsSprite.addChild(player2CommandPointsText);
 
 
         var player1TurnEndedSprite = game.add.sprite(0, 0);
         player1TurnEndedSprite.fixedToCamera = true;
-        player1TurnEndedText = game.add.text(5,35, $translate('TURNSTATE')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player1TurnEndedText = game.add.text(5, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#FF0000'});
         player1TurnEndedSprite.addChild(player1TurnEndedText);
 
         var player2TurnEndedSprite = game.add.sprite(0, 0);
         player2TurnEndedSprite.fixedToCamera = true;
-        player2TurnEndedText = game.add.text(CANVASWIDTH-180,35, $translate('TURNSTATE')+ ": ", { font: '20px Arial', fill: '#FF0000'});
+        player2TurnEndedText = game.add.text(CANVASWIDTH - 180, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#FF0000'});
         player2TurnEndedSprite.addChild(player2TurnEndedText);
     }
 
@@ -123,8 +125,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
         xExtraByCamera = game.camera.x;
         yExtraByCamera = game.camera.y;
 
-        if(btnEndTurn != undefined)
-        {
+        if (btnEndTurn != undefined) {
             btnEndTurn.bringToTop();
 
         }
@@ -133,23 +134,24 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
 
     function render() {
 
-  //
+        //
 //            miniShipGroup.z=1000;
 //            btnEndTurn.bringToTop();
 
     }
+
 //endregion
     function resetGame() {
         Spinner.spinner.spin(Spinner.target);
         $.blockUI({ message: null });
-        ActiveGame.get({gameId: $routeParams.gameId}, applyGameActiveViewModelData, function(){
+        ActiveGame.get({gameId: $routeParams.gameId}, applyGameActiveViewModelData, function () {
             Spinner.spinner.stop();
             $.unblockUI();
         });
     }
 
     function drawGame() {
-     //   game.add.sprite(0, 0, 'bg');
+        //   game.add.sprite(0, 0, 'bg');
         lineGroup = game.add.group();
         lineGroup.z = 0;
         var graphics = game.add.graphics(0, 0, lineGroup);
@@ -159,7 +161,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             drawPlanets(data);
             drawConnections();
             resetGame();
-        }, function(){
+        }, function () {
         });
 
         function drawPlanets(data) {
@@ -179,7 +181,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             btnEndTurn.events.onInputDown.add(onClickEndTurn);
             btnEndTurn.fixedToCamera = true;
             btnEndTurn.cameraOffset.setTo(CANVASWIDTH / 2 - 92, CANVASHEIGHT - 83);
-        //    miniShipGroup.add(btnEndTurn);
+            //    miniShipGroup.add(btnEndTurn);
             game.world.add(btnEndTurn);
             var planetArray = data.planets;
 
@@ -214,6 +216,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     function applyGameActiveViewModelData(data) {
         Spinner.spinner.stop();
         $.unblockUI();
+        $scope.gameName = data.game.name;
         $scope.game.activePlayerId = data.activePlayerId;
         if (data.game.player2.playerId == $scope.game.activePlayerId) {
             game.camera.x = FARRESTPOINTOFCAMERA;
@@ -246,10 +249,10 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
                     resetGame();
                 });
             } else {
-                showNotification($translate('INSUFFICIENTCOMMANDPOINTS'));
+                showNotification($translate('INSUFFICIENTCOMMANDPOINTS'), 2500);
             }
         } else {
-            showNotification($translate('TURNENDED'));
+            showNotification($translate('TURNENDED'), 2500);
         }
     }
 
@@ -294,11 +297,11 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
                         resetGame();
                     });
                 } else {
-                    showNotification($translate('INSUFFICIENTCOMMANDPOINTS'));
+                    showNotification($translate('INSUFFICIENTCOMMANDPOINTS'), 2500);
 
                 }
             } else {
-                showNotification($translate('TURNENDED'));
+                showNotification($translate('TURNENDED'), 2500);
             }
         }
     }
@@ -344,7 +347,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             $scope.activePlayerIsTurnEnded = gameData.player1.turnEnded;
             otherTurnEnded = gameData.player2.turnEnded;
 
-            player1IsActive= true;
+            player1IsActive = true;
         } else if ($scope.game.activePlayerId == gameData.player2.playerId) {
             $scope.game.opponentPlayerId = gameData.player1.playerId;
             $scope.game.opponentPlayerColonyImage = 'player1castle';
@@ -357,11 +360,9 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             player2IsActive = true;
 
         }
-        if(oldOtherTurnEnded || oldTurnEnded  )
-        {
-            if(!$scope.activePlayerIsTurnEnded && !otherTurnEnded )
-            {
-                showNotification($translate('TURNHASBEGUN'))
+        if (oldOtherTurnEnded || oldTurnEnded) {
+            if (!$scope.activePlayerIsTurnEnded && !otherTurnEnded) {
+                showNotification($translate('TURNHASBEGUN'), 2500)
             }
         }
 
@@ -371,7 +372,7 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
         var loserPlayerId = gameData.loserPlayerId;
         if (loserPlayerId > 0) {
             if ($scope.game.activePlayerId == loserPlayerId) {
-                showNotification($translate('LOSTTHEGAME'));
+                showNotification($translate('LOSTTHEGAME'), 0);
 
             } else {
                 p = game.add.emitter(game.world.centerX, 200, 200);
@@ -417,13 +418,11 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             colonyGroup = game.add.group();
             colonyGroup.z = 3;
 
-            for(var key in $scope.planetXSpritesByLetter)
-            {
+            for (var key in $scope.planetXSpritesByLetter) {
                 $scope.planetXSpritesByLetter[key].colonyXSprite = null;
             }
             $scope.colonyXSpritesById = [];
-            if(player2IsActive)
-            {
+            if (player2IsActive) {
             }
 
             drawColoniesOfPlayer(gameData.player2, 'player2castle', player2IsActive, null);
@@ -436,18 +435,18 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
             for (var colonyKey in colonies) {
                 var colony = colonies[colonyKey];
                 var colonyXSprite;
-                if(isActive)
-                {
+                if (isActive) {
                     colonyXSprite = new ColonyExtendedSprite(game, colony, colony.planetName, player.playerId, image, colonyGroup, $scope.planetXSpritesByLetter, colonyListener);
                     colonyXSprite.miniShipSprite = new MiniShipExtendedSprite(game, colonyXSprite, $scope.planetXSpritesByLetter, miniShipListener, $scope.activePlayerMiniShipImage, colonyGroup);
-                    }else{
+                } else {
                     colonyXSprite = new ColonyExtendedSprite(game, colony, colony.planetName, player.playerId, image, colonyGroup, $scope.planetXSpritesByLetter, null);
                 }
                 $scope.colonyXSpritesById[colony.colonyId] = colonyXSprite;
                 $scope.planetXSpritesByLetter[colony.planetName].colonyXSprite = colonyXSprite;
             }
         }
-     //   game.world.sort("z");
+
+        //   game.world.sort("z");
     }
 
     function onClickEndTurn() {
@@ -466,23 +465,24 @@ spaceApp.controller("GameController", function ($scope,$templateCache, $translat
     }
 
     function updateCommandPoints() {
-        player1CommandPointsText.setText($translate('COMMANDPOINTS')+ ": " + $scope.player1CommandPoints);
+        player1CommandPointsText.setText($translate('COMMANDPOINTS') + ": " + $scope.player1CommandPoints);
 
-        player2CommandPointsText.setText($translate('COMMANDPOINTS')+ ": " + $scope.player2CommandPoints);
-        player1TurnEndedText.setText($translate('TURNSTATE')+ ": " + ($scope.player1IsTurnEnded ? $translate('TURNENDEDSTATE'): $translate('TURNBUSYSTATE')));
-        player2TurnEndedText.setText($translate('TURNSTATE')+ ": " + ($scope.player2IsTurnEnded ? $translate('TURNENDEDSTATE'): $translate('TURNBUSYSTATE')));
+        player2CommandPointsText.setText($translate('COMMANDPOINTS') + ": " + $scope.player2CommandPoints);
+        player1TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player1IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));
+        player2TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player2IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));
 
     }
 
-    function showNotification(string) {
+    function showNotification(string, delay) {
         var sprite = game.add.sprite(0, 0);
         var text = game.add.text(5, 5, string, { font: '20px Arial', fill: '#FF0000', align: "center"});
         sprite.addChild(text);
         sprite.fixedToCamera = true;
         sprite.cameraOffset.setTo(CANVASWIDTH / 2, CANVASHEIGHT / 2);
-
-        setTimeout(function () {
-            sprite.destroy();
-        }, 2500);
+        if (delay != 0) {
+            setTimeout(function () {
+                sprite.destroy();
+            }, delay);
+        }
     }
 });

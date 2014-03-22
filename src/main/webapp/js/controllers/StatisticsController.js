@@ -12,7 +12,7 @@ spaceApp.controller("StatisticsController", function ($scope, $translate, Statis
     };
 
     StatisticsService.get(function (data) {
-        //$scope.statistics = data;
+        $scope.statistics = data;
         var DataStats = {
             labels: ["Win Ratio: " + $scope.statistics.winRatio , "Number of Games: " +$scope.statistics.amountOfGames, "average Colonies per win: " + $scope.statistics.averageAmountOfColoniesPerWin, "average Ships per win: " + $scope.statistics.averageAmountOfShipsPerWin],
             datasets: [
@@ -21,7 +21,7 @@ spaceApp.controller("StatisticsController", function ($scope, $translate, Statis
                     strokeColor : "rgba(255,0,0,1)",
                     pointColor : "rgba(255,0,0,1)",
                     pointStrokeColor : "#E1E81A",
-                    data: [$scope.statistics.winRatio, $scope.statistics.amountOfGames, $scope.statistics.averageAmountOfColoniesPerWin, $scope.statistics.averageAmountOfShipsPerWin]
+                    data: [$scope.statistics.winRatio*100, $scope.statistics.amountOfGames, $scope.statistics.averageAmountOfColoniesPerWin, $scope.statistics.averageAmountOfShipsPerWin]
                 }
             ]
         };

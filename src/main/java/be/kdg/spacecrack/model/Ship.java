@@ -28,6 +28,10 @@ public class Ship extends Piece {
     @JoinColumn(name = "planetId")
     private Planet planet;
 
+
+    @Version
+    private int versionNumber;
+
     public int getShipId() {
         return shipId;
     }

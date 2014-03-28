@@ -28,6 +28,9 @@ public class Colony extends Piece {
     @JoinColumn(name = "playerId")
     private Player player;
 
+    @Version
+    private int versionNumber;
+
     public Colony() {}
 
     public Colony(Planet planet, Player player, int strenght) {

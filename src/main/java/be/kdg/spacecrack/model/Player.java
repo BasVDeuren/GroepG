@@ -42,6 +42,8 @@ public class Player {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
     private List<Ship> ships = new ArrayList<Ship>();
 
+
+
     @Column(name = "commandPoints")
     private int commandPoints;
 
@@ -54,6 +56,8 @@ public class Player {
     @ManyToOne(cascade = CascadeType.ALL)
     private Game game;
 
+    @Version
+    private int versionNumber;
     public int getCommandPoints() {
         return commandPoints;
     }

@@ -29,6 +29,9 @@ public class Game {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
     private List<Player> players = new ArrayList<Player>();
 
+    @Version
+    @Column
+    private int versionNumber;
     @Column
     private int actionNumber;
 
@@ -88,7 +91,9 @@ public class Game {
         this.actionNumber = actionNumber;
     }
 
+
     public void incrementActionNumber() {
+
         actionNumber++;
     }
 }

@@ -14,6 +14,7 @@ public class Perimeter {
     public Perimeter() {}
 
     public Perimeter(List<Planet> insidePlanets, List<Planet> outsidePlanets) {
+
         this.insidePlanets = insidePlanets;
         this.outsidePlanets = outsidePlanets;
     }

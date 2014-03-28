@@ -11,13 +11,11 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
-
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -79,8 +77,8 @@ public class IntegrationAccessTokenControllerTests extends BaseFilteredIntegrati
     @Test
     public void login_InvalidUser_Unauthorized() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = post("/accesstokens").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"badUser\",\"password\":\"testPassword\"}").accept(MediaType.APPLICATION_JSON);
-        MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
-        mockMvcWithoutGlobalExceptionHandler.perform(requestBuilder).andExpect(status().isUnauthorized());
+       // MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
+        mockMvc.perform(requestBuilder).andExpect(status().isUnauthorized());
     }
 
 

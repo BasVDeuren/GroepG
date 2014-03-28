@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /* Git $Id$
@@ -121,6 +122,7 @@ public class GameService implements IGameService {
         moveShipHandler.validateMove(ship, destinationPlanet);
         moveShipHandler.moveShip(ship, destinationPlanet);
         checkLost(game);
+        game.incrementActionNumber();
         gameSynchronizer.updateGame(game);
     }
 
@@ -140,14 +142,13 @@ public class GameService implements IGameService {
     @Override
     public void endTurn(Integer playerID) {
         Player player = playerRepository.getPlayerByPlayerId(playerID);
+
         Game game = gameRepository.getGameByGameId(player.getGame().getGameId());
         Integer oldActionNumber = game.getActionNumber();
 
 
         if (!player.isTurnEnded()) {
 
-//            player.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
-//            player.setTurnEnded(true);
             player.setTurnEnded(true);
             boolean allTurnsEnded = true;
             List<Player> players = game.getPlayers();
@@ -167,6 +168,7 @@ public class GameService implements IGameService {
         } else {
             throw new SpaceCrackNotAcceptableException("Turn is already ended");
         }
+
         gameSynchronizer.updateGameConcurrent(game, oldActionNumber);
     }
 
@@ -190,6 +192,7 @@ public class GameService implements IGameService {
 
     @Override
     public Player getActivePlayer(User user, Game game) {
+
         for (Player p : user.getProfile().getPlayers()) {
             for (Player gamePlayer : game.getPlayers()) {
                 if (gamePlayer.getPlayerId() == p.getPlayerId()) {
@@ -212,15 +215,15 @@ public class GameService implements IGameService {
         if (player.getCommandPoints() < BUILDSHIP_COST || player.isTurnEnded()) {
             throw new SpaceCrackNotAcceptableException("Dear Sir or Lady, you have either run out of command points or your turn has ended, please wait for the other players to end their turn.");
         }
-        for (Ship ship : player.getShips()) {
-            if (ship.getPlanet().getName().equals(colony.getPlanet().getName())) {
-                shipOnPlanet = ship;
-            }
+        Optional<Ship> shipOptional = player.getShips().stream().filter(s -> s.getPlanet().getName().equals(colony.getPlanet().getName())).findFirst();
+
+        if (shipOptional.isPresent()) {
+            shipOnPlanet = shipOptional.get();
         }
 
-        Ship ship;
+
         if (shipOnPlanet == null) {
-            ship = new Ship();
+            Ship ship = new Ship();
             ship.setStrength(NEW_SHIP_STRENGTH);
             ship.setPlayer(player);
             ship.setPlanet(colony.getPlanet());
@@ -229,6 +232,7 @@ public class GameService implements IGameService {
         }
 
         player.setCommandPoints(player.getCommandPoints() - BUILDSHIP_COST);
+        game.incrementActionNumber();
         gameSynchronizer.updateGame(game);
     }
 

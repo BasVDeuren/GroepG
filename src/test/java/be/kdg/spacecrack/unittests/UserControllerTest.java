@@ -13,9 +13,7 @@ import be.kdg.spacecrack.services.UserService;
 import be.kdg.spacecrack.viewmodels.UserViewModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -39,8 +37,7 @@ import static org.mockito.Mockito.*;
  */
 @Transactional
 public class UserControllerTest extends BaseUnitTest {
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
+
 
     private IUserRepository userRepository;
     private IAuthorizationService tokenService;
@@ -84,10 +81,8 @@ public class UserControllerTest extends BaseUnitTest {
         Mockito.verify(userService, VerificationModeFactory.times(1)).updateUser(user);
     }
 
-    @Test
+    @Test(expected = SpaceCrackNotAcceptableException.class)
     public void EditUser_BadRepeatPassword_SpaceCrackNotAcceptableException() throws Exception {
-        expectedEx.expect(SpaceCrackNotAcceptableException.class);
-        expectedEx.expectMessage("Passwords should be the same!");
 
         User user = new User("username", "password", "email", true);
         when(userRepository.getUserByAccessToken(any(AccessToken.class))).thenReturn(user);
@@ -110,9 +105,9 @@ public class UserControllerTest extends BaseUnitTest {
         assertEquals("User from usercontroller should be the same as from db", expextedUser, actual);
     }
 
-    @Test
+    @Test(expected = SpaceCrackUnauthorizedException.class)
     public void testGetUser_NotInDbToken_SpaceCrackNotAcceptableException() throws Exception {
-        expectedEx.expect(SpaceCrackUnauthorizedException.class);
+
 
         AccessToken invalidAccessToken = new AccessToken("TokenNotInDb");
         when(userRepository.getUserByAccessToken(any(AccessToken.class))).thenReturn(null);

@@ -144,9 +144,9 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         ObjectMapper objectMapper = new ObjectMapper();
         String invalidUserWrapper = objectMapper.writeValueAsString(new UserViewModel("username", "password", "badpassword", "email@gmail.com"));
         MockHttpServletRequestBuilder postRequestBuilder = post("/user");
-        MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
+   //     MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
 
-        mockMvcWithoutGlobalExceptionHandler.perform(postRequestBuilder
+        mockMvc.perform(postRequestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(invalidUserWrapper))

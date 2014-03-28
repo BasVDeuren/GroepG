@@ -172,8 +172,6 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
         });
 
         function drawPlanets(data) {
-
-
             planetGroup = game.add.group();
             planetGroup.z = 1;
             colonyGroup = game.add.group();

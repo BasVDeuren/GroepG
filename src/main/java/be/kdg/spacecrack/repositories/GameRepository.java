@@ -35,7 +35,7 @@ public class GameRepository implements IGameRepository {
 
     @Override
     public int createOrUpdateGame(Game game) {
-        game.incrementActionNumber();
+
         Session session = sessionFactory.getCurrentSession();
         session.saveOrUpdate(game);
 
@@ -117,7 +117,7 @@ public class GameRepository implements IGameRepository {
     {
         return false;
     }else{
-        game.incrementActionNumber();
+
         session.update(game);
     }
 

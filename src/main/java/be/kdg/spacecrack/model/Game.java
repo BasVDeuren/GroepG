@@ -38,6 +38,10 @@ public class Game {
     @Column
     private int loserPlayerId;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
+    private List<Game_Planet> gamePlanets = new ArrayList<>();
+
     public String getName() {
         return name;
     }
@@ -95,5 +99,26 @@ public class Game {
     public void incrementActionNumber() {
 
         actionNumber++;
+    }
+
+    public void internalAddGame_Planet(Game_Planet game_planet) {
+        gamePlanets.add(game_planet);
+    }
+
+    public void addGame_Planet(Game_Planet game_planet) {
+        game_planet.internalSetGame(this);
+        gamePlanets.add(game_planet);
+    }
+
+    public List<Game_Planet> getGamePlanets() {
+        return gamePlanets;
+    }
+
+    public void setGamePlanets(List<Game_Planet> gamePlanets) {
+        this.gamePlanets = gamePlanets;
+    }
+
+    public Game_Planet getGame_PlanetByPlanet(Planet planet) {
+        return gamePlanets.stream().filter(gp -> gp.getPlanet().getName().equals(planet.getName())).findFirst().get();
     }
 }

@@ -7,6 +7,7 @@ package be.kdg.spacecrack.unittests;/* Git $Id$
  */
 
 import be.kdg.spacecrack.model.Game;
+import be.kdg.spacecrack.model.Game_Planet;
 import be.kdg.spacecrack.model.Player;
 import be.kdg.spacecrack.model.Ship;
 import be.kdg.spacecrack.repositories.GameRepository;
@@ -35,8 +36,12 @@ public class ShipRepositoryTests extends  BaseUnitTest{
     public void saveGameWithPlayerAndShip_valid_shipandplayerCreatedIn1Query() {
         //region Arrange
         Ship ship = new Ship();
-        Player player = new Player();
         Game game = new Game();
+        Game_Planet game_planet = new Game_Planet();
+        game.addGame_Planet(game_planet);
+        ship.setGame_planet(game_planet);
+        Player player = new Player();
+
         //Create Player and add to game
 
         game.getPlayers().add(player);

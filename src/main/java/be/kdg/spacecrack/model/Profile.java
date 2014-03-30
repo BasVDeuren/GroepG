@@ -41,12 +41,12 @@ public class Profile {
     @Type(type="text")
     private String image;
 
-    @Cascade(value = CascadeType.ALL)
+    @Cascade(value = CascadeType.SAVE_UPDATE)
     @OneToOne(mappedBy = "profile")
     @JsonBackReference
     private User user;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "profile")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "profile")
     @JsonIgnore
     private List<Player> players = new ArrayList<Player>();
 

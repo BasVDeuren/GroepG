@@ -66,7 +66,7 @@ public class ReplayTests {
         IFirebaseUtil mockedFirebaseUtil = mock(IFirebaseUtil.class);
         GameRepository gameRepository = new GameRepository(sessionFactory);
         IGameSynchronizer gameSynchronizer = new GameSynchronizer(new ViewModelConverter(), mockedFirebaseUtil, gameRepository);
-        gameService = new GameService(new PlanetRepository(sessionFactory), colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, new PlanetRepository(sessionFactory), gameSynchronizer), new ViewModelConverter(), gameSynchronizer);
+        gameService = new GameService(new PlanetRepository(sessionFactory), colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, new PlanetRepository(sessionFactory), gameSynchronizer, shipRepository), new ViewModelConverter(), gameSynchronizer);
     }
 
 

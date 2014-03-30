@@ -11,12 +11,10 @@ import be.kdg.spacecrack.commands.Action;
 import be.kdg.spacecrack.commands.BuildShipAction;
 import be.kdg.spacecrack.commands.EndTurnAction;
 import be.kdg.spacecrack.commands.MoveShipAction;
-import be.kdg.spacecrack.model.Game;
 import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.utilities.IFirebaseUtil;
-import be.kdg.spacecrack.viewmodels.ActionViewModel;
-import be.kdg.spacecrack.viewmodels.GameViewModel;
 import be.kdg.spacecrack.utilities.IViewModelConverter;
+import be.kdg.spacecrack.viewmodels.ActionViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,10 +73,10 @@ public class ActionController{
             throw new SpaceCrackNotAcceptableException("Unsupported action type");
         }
         action.execute();
-        Game game = gameService.getGameByGameId(actionViewModel.getGameId());
-        GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
-
-        firebaseUtil.setValue(GameController.GAMESUFFIX + gameViewModel.getGameId(), gameViewModel);
+//        Game game = gameService.getGameByGameId(actionViewModel.getGameId());
+//        GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
+//
+//        firebaseUtil.setValue(GameController.GAMESUFFIX + gameViewModel.getGameId(), gameViewModel);
 
     }
 

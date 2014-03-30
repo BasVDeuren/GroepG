@@ -8,9 +8,13 @@ package be.kdg.spacecrack.model;/* Git $Id$
 
 //import org.codehaus.jackson.annotate.JsonIgnore;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Audited
@@ -20,17 +24,26 @@ public class Ship extends Piece {
     @GeneratedValue
     private int shipId;
 
-    @ManyToOne(fetch = FetchType.EAGER )
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "playerId")
     private Player player;
 
-    @ManyToOne(fetch= FetchType.EAGER)
-    @JoinColumn(name = "planetId")
-    private Planet planet;
 
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_planetId", nullable = false)
+    private Game_Planet game_planet;
 
     @Version
     private int versionNumber;
+
+    public Ship() {}
+
+    public Ship(Game_Planet game_planet) {
+        setGame_planet(game_planet);
+    }
+
 
     public int getShipId() {
         return shipId;
@@ -40,23 +53,15 @@ public class Ship extends Piece {
         this.shipId = shipId;
     }
 
-    public Ship() {}
 
-    public Ship(Planet planet) {
-        this.planet = planet;
-    }
+
+
 
     public Player getPlayer() {
         return player;
     }
 
-    public void setPlanet(Planet planet) {
-        this.planet = planet;
-    }
 
-    public Planet getPlanet() {
-        return planet;
-    }
 
     public void setPlayer(Player player) {
         this.player = player;
@@ -65,5 +70,24 @@ public class Ship extends Piece {
 
     protected void internalSetPlayer(Player player) {
         this.player = player;
+    }
+
+    public Game_Planet getGame_planet() {
+        return game_planet;
+    }
+
+    public void setGame_planet(Game_Planet game_planet) {
+        game_planet.internalSetShip(this);
+        this.game_planet = game_planet;
+    }
+
+
+    public void internalSetGame_Planet(Game_Planet game_planet) {
+        this.game_planet = game_planet;
+    }
+
+    @Deprecated
+    public void setPlanet(Planet planet) {
+        setGame_planet(player.getGame().getGame_PlanetByPlanet(planet));
     }
 }

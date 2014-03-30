@@ -42,7 +42,7 @@ public class StatisticsServiceTests extends BaseUnitTest{
         ShipRepository shipRepository = new ShipRepository(sessionFactory);
         PlanetRepository planetRepository = new PlanetRepository(sessionFactory);
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, new GameRepository(sessionFactory), new MoveShipHandler(colonyRepository,planetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, new GameRepository(sessionFactory), new MoveShipHandler(colonyRepository,planetRepository, mockGameSynchronizer, shipRepository), new ViewModelConverter(), mockGameSynchronizer);
 
         mockGameRepository = mock(IGameRepository.class);
         mockProfileRepository = mock(IProfileRepository.class);
@@ -142,7 +142,10 @@ public class StatisticsServiceTests extends BaseUnitTest{
 
         for(int i = 0; i < amountOfColonies; i++) {
             Colony colony = new Colony();
-            colony.setPlanet(new Planet());
+            Planet planet = null;
+            Game_Planet game_planet = new Game_Planet(planet);
+            planet = new Planet();
+            colony.setGame_planet(game_planet);
             player1.addColony(colony);
         }
 

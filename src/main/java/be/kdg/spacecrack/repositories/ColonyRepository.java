@@ -19,6 +19,7 @@ import java.util.List;
 
 @Component("colonyRepository")
 public class ColonyRepository implements IColonyRepository {
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private SessionFactory sessionFactory;
@@ -47,5 +48,11 @@ public class ColonyRepository implements IColonyRepository {
         q.setParameter("colonyId", colonyId);
 
         return (Colony) q.uniqueResult();
+    }
+
+    @Override
+    public void delete(Colony colony) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(colony);
     }
 }

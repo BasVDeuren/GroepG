@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /* Git $Id$
@@ -69,6 +71,14 @@ public class GameService implements IGameService {
     public int createGame(Profile userProfile, String gameName, Profile opponentProfile) {
         Game game = new Game();
 
+        Planet[] planetsArray = planetRepository.getAll();
+        List<Planet> planets = Arrays.asList(planetsArray);
+
+        planets.forEach(planet -> {
+          Game_Planet game_planet = new Game_Planet(planet);
+          game.addGame_Planet(game_planet);
+
+        });
         Player player1 = new Player();
         Player player2 = new Player();
 
@@ -87,8 +97,14 @@ public class GameService implements IGameService {
         Planet planetA = planetRepository.getPlanetByName("a");
         Planet planetA3 = planetRepository.getPlanetByName("a3");
 
-        Ship player1StartingShip = new Ship(planetA);
-        Ship player2StartingShip = new Ship(planetA3);
+        Optional<Game_Planet> game_planetAOptional = game.getGamePlanets().stream().filter(gp -> gp.getPlanet().getName().equals("a")).findFirst();
+        Optional<Game_Planet> game_planetA3Optional = game.getGamePlanets().stream().filter(gp -> gp.getPlanet().getName().equals("a3")).findFirst();
+
+
+        Game_Planet game_planetA = game_planetAOptional.get();
+        Ship player1StartingShip = new Ship(game_planetA);
+        Game_Planet game_planetA3 = game_planetA3Optional.get();
+        Ship player2StartingShip = new Ship(game_planetA3);
 
         player1StartingShip.setStrength(NEW_SHIP_STRENGTH);
         player2StartingShip.setStrength(NEW_SHIP_STRENGTH);
@@ -97,8 +113,8 @@ public class GameService implements IGameService {
         player2StartingShip.setPlayer(player2);
 
 
-        Colony player1StartingColony = new Colony(planetA);
-        Colony player2StartingColony = new Colony(planetA3);
+        Colony player1StartingColony = new Colony(game_planetA);
+        Colony player2StartingColony = new Colony(game_planetA3);
 
         player1StartingColony.setStrength(NEW_COLONY_STRENGHT);
         player2StartingColony.setStrength(NEW_COLONY_STRENGHT);
@@ -136,7 +152,7 @@ public class GameService implements IGameService {
     @Override
     public Planet getShipLocationByShipId(int shipId) {
         Ship shipDb = shipRepository.getShipByShipId(shipId);
-        return shipDb.getPlanet();
+        return shipDb.getGame_planet().getPlanet();
     }
 
     @Override
@@ -152,6 +168,7 @@ public class GameService implements IGameService {
             player.setTurnEnded(true);
             boolean allTurnsEnded = true;
             List<Player> players = game.getPlayers();
+
             for (Player p : players) {
                 if (!p.isTurnEnded()) {
                     allTurnsEnded = false;
@@ -193,14 +210,12 @@ public class GameService implements IGameService {
     @Override
     public Player getActivePlayer(User user, Game game) {
 
-        for (Player p : user.getProfile().getPlayers()) {
-            for (Player gamePlayer : game.getPlayers()) {
-                if (gamePlayer.getPlayerId() == p.getPlayerId()) {
-                    return gamePlayer;
-                }
-            }
+        Stream<Player> gamePlayersStream = game.getPlayers().stream();
+        Optional<Player> shipOptional = gamePlayersStream.filter(p -> user.getProfile().getPlayers().contains(p)).findFirst();
+        if(!shipOptional.isPresent()){
+            throw new SpaceCrackUnexpectedException("This user isn't playing this game");
         }
-        throw new SpaceCrackUnexpectedException("This user isn't playing this game");
+        return shipOptional.get();
 
     }
 
@@ -215,7 +230,7 @@ public class GameService implements IGameService {
         if (player.getCommandPoints() < BUILDSHIP_COST || player.isTurnEnded()) {
             throw new SpaceCrackNotAcceptableException("Dear Sir or Lady, you have either run out of command points or your turn has ended, please wait for the other players to end their turn.");
         }
-        Optional<Ship> shipOptional = player.getShips().stream().filter(s -> s.getPlanet().getName().equals(colony.getPlanet().getName())).findFirst();
+        Optional<Ship> shipOptional = player.getShips().stream().filter(s -> s.getGame_planet().getPlanet().getName().equals(colony.getGame_planet().getPlanet().getName())).findFirst();
 
         if (shipOptional.isPresent()) {
             shipOnPlanet = shipOptional.get();
@@ -226,7 +241,7 @@ public class GameService implements IGameService {
             Ship ship = new Ship();
             ship.setStrength(NEW_SHIP_STRENGTH);
             ship.setPlayer(player);
-            ship.setPlanet(colony.getPlanet());
+            ship.setGame_planet(colony.getGame_planet());
         } else {
             shipOnPlanet.setStrength(shipOnPlanet.getStrength() + NEW_SHIP_STRENGTH);
         }

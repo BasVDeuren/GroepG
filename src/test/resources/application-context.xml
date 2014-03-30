@@ -85,6 +85,7 @@
 
     <bean id="transactionManager"
           class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+          p:nestedTransactionAllowed="true"
           p:sessionFactory-ref="sessionFactory">
     </bean>
 </beans>

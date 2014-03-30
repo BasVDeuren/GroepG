@@ -34,7 +34,8 @@ public class TokenRepository implements ITokenRepository {
         @SuppressWarnings("JpaQlInspection") Query q = session.createQuery("from AccessToken a where a.value = :value");
         q.setParameter("value", value);
 
-        return (AccessToken) q.uniqueResult();
+        AccessToken accessToken = (AccessToken) q.uniqueResult();
+        return accessToken;
     }
 
 

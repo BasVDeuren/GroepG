@@ -34,4 +34,10 @@ public class ShipRepository implements IShipRepository {
 
         return (Ship) q.uniqueResult();
     }
+
+    @Override
+    public void delete(Ship ship) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(ship);
+    }
 }

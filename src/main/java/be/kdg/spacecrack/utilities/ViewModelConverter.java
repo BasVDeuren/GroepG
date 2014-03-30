@@ -25,7 +25,7 @@ public class ViewModelConverter implements IViewModelConverter {
     public ColonyViewModel convertColonyToViewModel(Colony colony) {
         ColonyViewModel colonyViewModel = new ColonyViewModel();
         colonyViewModel.setColonyId(colony.getColonyId());
-        colonyViewModel.setPlanetName(colony.getPlanet().getName());
+        colonyViewModel.setPlanetName(colony.getGame_planet().getPlanet().getName());
         colonyViewModel.setStrength(colony.getStrength());
         return colonyViewModel;
     }
@@ -95,7 +95,7 @@ public class ViewModelConverter implements IViewModelConverter {
     public ShipViewModel convertShipToViewModel(Ship ship) {
         ShipViewModel shipViewModel = new ShipViewModel();
         shipViewModel.setShipId(ship.getShipId());
-        shipViewModel.setPlanetName(ship.getPlanet().getName());
+        shipViewModel.setPlanetName(ship.getGame_planet().getPlanet().getName());
         shipViewModel.setStrength(ship.getStrength());
         return shipViewModel;
     }

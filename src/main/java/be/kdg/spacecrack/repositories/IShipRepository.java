@@ -10,4 +10,6 @@ import be.kdg.spacecrack.model.Ship;
 
 public interface IShipRepository {
     Ship getShipByShipId(int shipId);
+
+    void delete(Ship ship);
 }

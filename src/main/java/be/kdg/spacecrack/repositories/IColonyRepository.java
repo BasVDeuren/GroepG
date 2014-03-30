@@ -19,4 +19,5 @@ public interface IColonyRepository {
     Colony getColonyById(Integer colonyId);
 
 
+    void delete(Colony colony);
 }

@@ -48,35 +48,39 @@ public class MoveShipUnitTests extends BaseUnitTest {
 
         Planet[] planets = createSimpleMapWith2Planets();
 
-        Game game = new Game();
+        Game game = getGame(planets);
+
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
 
         Colony colonyA = new Colony();
-        colonyA.setPlanet(planets[0]);
+
         colonyA.setPlayer(player);
+        colonyA.setPlanet(planets[0]);
         Colony colonyB = new Colony();
-        colonyB.setPlanet(planets[1]);
+
         colonyB.setPlayer(player);
+        colonyB.setPlanet(planets[1]);
         List<Colony> colonies = new ArrayList<Colony>();
         colonies.add(colonyA);
         colonies.add(colonyB);
         stub(mockColonyRepository.getColoniesByGame(any(Game.class))).toReturn(colonies);
 
         Ship ship = new Ship();
-        ship.setPlanet(planets[0]);
+
         Ship shipOnDestinationPlanet = new Ship();
-        shipOnDestinationPlanet.setPlanet(planets[1]);
+
 
         player.addShip(ship);
         player.addShip(shipOnDestinationPlanet);
-
+        shipOnDestinationPlanet.setPlanet(planets[1]);
+        ship.setPlanet(planets[0]);
         stub(mockShipRepository.getShipByShipId(argShipId)).toReturn(ship);
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
         stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldAmountOfShips = player.getShips().size();
         int oldCommandPoints = player.getCommandPoints();
         int expectedStrength = ship.getStrength() + shipOnDestinationPlanet.getStrength();
@@ -108,10 +112,10 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
         GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mock(IGameSynchronizer.class)) , new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mock(IGameSynchronizer.class), mockShipRepository) , new ViewModelConverter(), mockGameSynchronizer);
 
         Planet[] planets = createSimpleMapWith2Planets();
-        Game game =new Game();
+        Game game = getGame(planets);
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
         List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
@@ -150,7 +154,8 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         Planet[] planets = createSimpleMapWith2Planets();
-        Game game = new Game();
+        Game game = getGame(planets);
+
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
         List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
@@ -161,7 +166,7 @@ public class MoveShipUnitTests extends BaseUnitTest {
         stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
         stub(mockPlanetRepository.getAll()).toReturn(planets);
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldCommandPoints = player.getCommandPoints();
         //Act
         gameServiceWithMockedDependencies.moveShip(argShipId, argDestinationPlanetName);
@@ -200,7 +205,8 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         Planet[] planets = createSimpleMapWith2Planets();
-        Game game = new Game();
+        Game game = getGame(planets);
+
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
         List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
@@ -211,7 +217,7 @@ public class MoveShipUnitTests extends BaseUnitTest {
         stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldCommandPoints = player.getCommandPoints();
         //Act
         gameServiceWithMockedDependencies.moveShip(argShipId, argDestinationPlanetName);
@@ -248,20 +254,20 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
-        Planet[] planets = createSimpleMapWith2Planets();
-        Game game = new Game();
+        Planet[] planetsArray = createSimpleMapWith2Planets();
+        Game game = getGame(planetsArray);
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
-        List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
-        Ship ship = createShip(alliedShipStrength, planets[0], player);
-        Ship enemyShip =createShip(enemyShipStrenght, planets[1], opponent);
+        List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planetsArray, player, opponent);
+        Ship ship = createShip(alliedShipStrength, planetsArray[0], player);
+        Ship enemyShip =createShip(enemyShipStrenght, planetsArray[1], opponent);
         int oldEnemyShipStrength = enemyShip.getStrength();
         stub(mockColonyRepository.getColoniesByGame(any(Game.class))).toReturn(gameColonies);
         stub(mockShipRepository.getShipByShipId(argShipId)).toReturn(ship);
-        stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
+        stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planetsArray[1]);
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldCommandPoints = player.getCommandPoints();
         //endregion
         //region Act
@@ -281,6 +287,16 @@ public class MoveShipUnitTests extends BaseUnitTest {
         //endregion
     }
 
+    private Game getGame(Planet[] planetsArray) {
+        Game game = new Game();
+
+        for(Planet p : planetsArray)
+        {
+            game.addGame_Planet(new Game_Planet(p));
+        }
+        return game;
+    }
+
     @Transactional @Test
     public void moveShipToPlanetWithEnemyShip_ShipsStrengthEqual_BothShipsGoneColonyUnharmed() throws Exception {
         //region Arrange
@@ -297,7 +313,8 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         Planet[] planets = createSimpleMapWith2Planets();
-        Game game = new Game();
+        Game game = getGame(planets);
+
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
         List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
@@ -309,7 +326,7 @@ public class MoveShipUnitTests extends BaseUnitTest {
         stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldEnemyColonyAmount = opponent.getColonies().size();
         int oldCommandPoints = player.getCommandPoints();
         //endregion
@@ -347,7 +364,8 @@ public class MoveShipUnitTests extends BaseUnitTest {
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         Planet[] planets = createSimpleMapWith2Planets();
-        Game game = new Game();
+        Game game = getGame(planets);
+
         Player player = createActingPlayer(game);
         Player opponent = createOpponent(game);
         List<Colony> gameColonies = createAlliedAndEnemyColony(enemyColonyStrength, planets, player, opponent);
@@ -359,7 +377,7 @@ public class MoveShipUnitTests extends BaseUnitTest {
         stub(mockPlanetRepository.getPlanetByName(argDestinationPlanetName)).toReturn(planets[1]);
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer), new ViewModelConverter(), mockGameSynchronizer);
+        GameService gameServiceWithMockedDependencies = new GameService(mockPlanetRepository, mockColonyRepository, mockShipRepository, mockPlayerRepository, mockGameRepository, new MoveShipHandler(mockColonyRepository, mockPlanetRepository, mockGameSynchronizer, mockShipRepository), new ViewModelConverter(), mockGameSynchronizer);
         int oldEnemyColonyAmount = opponent.getColonies().size();
         int oldCommandPoints = player.getCommandPoints();
         int oldColonyStrenght = opponent.getColonies().get(0).getStrength();
@@ -390,12 +408,13 @@ public class MoveShipUnitTests extends BaseUnitTest {
     //region private methods
     private List<Colony> createAlliedAndEnemyColony(int strength, Planet[] planets, Player player, Player opponent) {
         Colony colonyA = new Colony();
-        colonyA.setPlanet(planets[0]);
+
         colonyA.setPlayer(player);
+        colonyA.setPlanet(planets[0]);
         Colony opponentColony = new Colony();
         opponentColony.setStrength(strength);
-        opponentColony.setPlanet(planets[1]);
         opponentColony.setPlayer(opponent);
+        opponentColony.setPlanet(planets[1]);
 
         List<Colony> gameColonies = new ArrayList<Colony>();
         gameColonies.addAll(player.getColonies());
@@ -443,8 +462,9 @@ public class MoveShipUnitTests extends BaseUnitTest {
         Ship ship = new Ship();
 
         ship.setStrength(strength);
-        ship.setPlanet(planet);
         ship.setPlayer(player);
+        ship.setPlanet(planet);
+
         return ship;
     }
 }

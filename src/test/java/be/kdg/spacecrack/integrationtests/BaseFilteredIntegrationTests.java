@@ -94,7 +94,7 @@ public abstract class BaseFilteredIntegrationTests {
             ViewModelConverter viewModelConverter = new ViewModelConverter();
             IFirebaseUtil firebaseUtil = mock(IFirebaseUtil.class);
             GameSynchronizer gameSynchronizer = new GameSynchronizer(viewModelConverter, firebaseUtil, gameRepository);
-            IMoveShipHandler moveShipHandler = new MoveShipHandler(colonyRepository, planetRepository, gameSynchronizer);
+            IMoveShipHandler moveShipHandler = new MoveShipHandler(colonyRepository, planetRepository, gameSynchronizer, shipRepository);
 
             GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
             IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, moveShipHandler, viewModelConverter, mockGameSynchronizer);

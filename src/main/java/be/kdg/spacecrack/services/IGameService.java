@@ -14,10 +14,14 @@ import java.util.List;
 public interface IGameService {
     public static final int START_COMMAND_POINTS = 8;
     public static final int COMMANDPOINTS_PER_TURN = START_COMMAND_POINTS;
-    public static final int BUILDSHIP_COST = 3;
+    public static final int BUILDSHIP_COST = 1;
     public static final int MOVESHIPCOST = 1;
     public static final int CREATECOLONYCOST = 1;
     public static final int NEW_SHIP_STRENGTH = 1;
+    public static final int NEW_COLONY_STRENGHT = 1;
+    public static final int PLAYER_START_CRACK = 100;
+    public static final int BUILDSHIP_CRACK_COST = 30;
+    int CRACK_PER_COLONY = 5;
 
     int createGame(Profile userProfile, String gameName, Profile opponentProfile);
 

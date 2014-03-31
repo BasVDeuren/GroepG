@@ -5,6 +5,7 @@ import be.kdg.spacecrack.model.*;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.GameSynchronizer;
+import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.services.IGameSynchronizer;
 import be.kdg.spacecrack.services.handlers.IMoveShipHandler;
 import be.kdg.spacecrack.services.handlers.MoveShipHandler;
@@ -78,6 +79,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         Player player = game.getPlayers().get(0);
         int oldCommandPoints = player.getCommandPoints();
+
         Ship ship = player.getShips().get(0);
 
         gameService.moveShip(ship.getShipId(), "b");
@@ -212,13 +214,16 @@ public class GameServiceTests extends BaseUnitTest {
 
     @Transactional
     @Test
-    public void endTurnBothPlayers_newCommandPoints() throws Exception {
+    public void endTurnBothPlayers_newCommandPointsAndCrack() throws Exception {
         Game game = createGame();
         Player player1 = game.getPlayers().get(0);
         int oldCommandPointsOfPlayer1 = player1.getCommandPoints();
+        int oldCrackOfPlayer1 = player1.getCrack();
         gameService.endTurn(player1.getPlayerId());
         Player player2 = game.getPlayers().get(1);
         int oldCommandPointsOfPlayer2 = player2.getCommandPoints();
+        int oldCrackOfPlayer2 = player2.getCrack();
+
 
         gameService.endTurn(player2.getPlayerId());
         player1 = playerRepository.getPlayerByPlayerId(player1.getPlayerId());
@@ -229,6 +234,9 @@ public class GameServiceTests extends BaseUnitTest {
 
         assertEquals(oldCommandPointsOfPlayer1 + GameService.COMMANDPOINTS_PER_TURN, player1.getCommandPoints());
         assertEquals(oldCommandPointsOfPlayer2 + GameService.COMMANDPOINTS_PER_TURN, player2.getCommandPoints());
+
+        assertEquals(oldCrackOfPlayer1 + GameService.CRACK_PER_COLONY, player1.getCrack());
+        assertEquals(oldCrackOfPlayer2 + GameService.CRACK_PER_COLONY, player2.getCrack());
 
         gameService.moveShip(player1.getShips().get(0).getShipId(), "b");
         gameService.moveShip(player2.getShips().get(0).getShipId(), "b3");
@@ -241,6 +249,7 @@ public class GameServiceTests extends BaseUnitTest {
         Player player = game.getPlayers().get(0);
         Ship ship = player.getShips().get(0);
         int oldAmountOfShips = player.getShips().size();
+        int oldCrack = player.getCrack();
 
         gameService.moveShip(ship.getShipId(), "b");
         Player playerDb = playerRepository.getPlayerByPlayerId(player.getPlayerId());
@@ -255,6 +264,9 @@ public class GameServiceTests extends BaseUnitTest {
         assertEquals("The ship should have strength", GameService.NEW_SHIP_STRENGTH, newShip.getStrength());
         assertEquals("Ship should be build on colony's planet", colony.getGame_planet(), playerDbShips.get(playerDbShips.size() - 1).getGame_planet());
         assertEquals("Player should have lost 3 commandPoints", oldCommandPoints - GameService.BUILDSHIP_COST, playerDb.getCommandPoints());
+        assertEquals("Player should have lost 30 crack", oldCrack - IGameService.BUILDSHIP_CRACK_COST, playerDb.getCrack());
+
+
     }
 
     @Transactional
@@ -267,10 +279,28 @@ public class GameServiceTests extends BaseUnitTest {
         gameService.moveShip(ship.getShipId(), "c");
         gameService.moveShip(ship.getShipId(), "b");
         gameService.moveShip(ship.getShipId(), "c");
+        gameService.moveShip(ship.getShipId(), "b");
+        gameService.moveShip(ship.getShipId(), "c");
+        gameService.moveShip(ship.getShipId(), "b");
+        gameService.moveShip(ship.getShipId(), "c");
         Colony colony = player.getColonies().get(0);
         gameService.buildShip(colony.getColonyId());
     }
 
+
+    @Transactional
+    @Test(expected = SpaceCrackNotAcceptableException.class)
+    public void buildShip_NoShipOnPlanetNotEnoughCrack_NoShipBuilt() {
+        Game game = createGame();
+        Player player = game.getPlayers().get(0);
+        Colony colony = player.getColonies().get(0);
+        gameService.buildShip(colony.getColonyId());
+        gameService.buildShip(colony.getColonyId());
+        gameService.buildShip(colony.getColonyId());
+        gameService.buildShip(colony.getColonyId());
+
+
+    }
     @Transactional
     @Test
     public void buildShip_ShipOnPlanetEnoughCommandPoints_shipMerged() {
@@ -282,6 +312,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         Player playerDb = playerRepository.getPlayerByPlayerId(player.getPlayerId());
         int oldCommandPoints = playerDb.getCommandPoints();
+        int oldCrack = playerDb.getCrack();
         Colony colony = player.getColonies().get(0);
         gameService.buildShip(colony.getColonyId());
         playerDb = playerRepository.getPlayerByPlayerId(player.getPlayerId());
@@ -291,7 +322,9 @@ public class GameServiceTests extends BaseUnitTest {
         assertEquals("Player shouldn't have more ships than before", oldAmountOfShips, playerDbShips.size());
         assertEquals("Ship should be build on colony's planet", colony.getGame_planet(), playerDbShips.get(playerDbShips.size() - 1).getGame_planet());
         assertEquals("The ship standing on the planet should now be more powerful", oldShipStrength + GameService.NEW_SHIP_STRENGTH, shipDb.getStrength());
-        assertEquals("Player should have lost 3 commandPoints", oldCommandPoints - GameService.BUILDSHIP_COST, playerDb.getCommandPoints());
+        assertEquals("Player should have lost 1 commandPoint", oldCommandPoints - GameService.BUILDSHIP_COST, playerDb.getCommandPoints( ));
+        assertEquals("Player should have lost 30 crack", oldCrack - IGameService.BUILDSHIP_CRACK_COST, playerDb.getCrack());
+
     }
 
     @Transactional
@@ -501,9 +534,8 @@ public class GameServiceTests extends BaseUnitTest {
         TransactionStatus status2 = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED));
 
         int gameId = gameService.createGame(deleteGameTestUser.getProfile(), "SpaceCrackName", opponentProfile);
-        Game game1 = gameService.getGameByGameId(gameId);
+        Game game = gameService.getGameByGameId(gameId);
 
-        Game game = game1;
         transactionManager.commit(status2);
 
         TransactionStatus status3 = transactionManager.getTransaction(new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED));
@@ -511,4 +543,6 @@ public class GameServiceTests extends BaseUnitTest {
         transactionManager.commit(status3);
 
     }
+
+
 }

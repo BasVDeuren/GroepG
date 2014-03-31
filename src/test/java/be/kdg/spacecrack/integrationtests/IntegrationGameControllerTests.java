@@ -58,12 +58,14 @@ public class IntegrationGameControllerTests extends BaseFilteredIntegrationTests
                 .andExpect(jsonPath("$.game.player1.ships[0].shipId", CoreMatchers.notNullValue()))
                 .andExpect(jsonPath("$.game.player1.ships[0].shipId", CoreMatchers.not(0)))
                 .andExpect(jsonPath("$.game.player1.ships[0].strength", CoreMatchers.is(GameService.NEW_SHIP_STRENGTH)))
+                .andExpect(jsonPath("$.game.player1.crack", CoreMatchers.is(GameService.PLAYER_START_CRACK)))
                 .andExpect(jsonPath("$.game.player2.colonies[0].planetName", CoreMatchers.is("a3")))
                 .andExpect(jsonPath("$.game.player2.colonies[0].strength", CoreMatchers.is(GameService.NEW_COLONY_STRENGHT)))
                 .andExpect(jsonPath("$.game.player2.ships[0].planetName", CoreMatchers.is("a3")))
                 .andExpect(jsonPath("$.game.player2.ships[0].shipId", CoreMatchers.notNullValue()))
                 .andExpect(jsonPath("$.game.player2.ships[0].shipId", CoreMatchers.not(0)))
-                .andExpect(jsonPath("$.game.player2.ships[0].strength", CoreMatchers.is(GameService.NEW_SHIP_STRENGTH)));
+                .andExpect(jsonPath("$.game.player2.ships[0].strength", CoreMatchers.is(GameService.NEW_SHIP_STRENGTH)))
+                .andExpect(jsonPath("$.game.player2.crack", CoreMatchers.is(GameService.PLAYER_START_CRACK)));
     }
 
     @Test

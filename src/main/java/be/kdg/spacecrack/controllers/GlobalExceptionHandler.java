@@ -7,6 +7,7 @@ package be.kdg.spacecrack.controllers;/* Git $Id$
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
+import be.kdg.spacecrack.Exceptions.SpaceCrackUnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -31,9 +32,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public String handleException(Exception e) throws Exception {
+    public void handleException(Exception e) throws Exception {
         if(e instanceof ValidationException)
         {
             throw new SpaceCrackNotAcceptableException("Constraint violated");
@@ -46,6 +45,7 @@ public class GlobalExceptionHandler {
         {
             logger.error(ste.toString());
         }
-        return "Something bad happened";
+        throw new SpaceCrackUnexpectedException("Something bad happened");
+       // return "Something bad happened";
     }
 }

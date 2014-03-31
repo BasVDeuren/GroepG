@@ -6,7 +6,6 @@ package be.kdg.spacecrack.model;/* Git $Id$
  *
  */
 
-//import org.codehaus.jackson.annotate.JsonIgnore;
 
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;

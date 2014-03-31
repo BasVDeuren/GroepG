@@ -9,13 +9,15 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
 //Consts not supported internet explorer
 
     //region Constants
-    var BUILDSHIPCOST = 3;
+    var BUILDSHIPCOST = 1;
     var COLONIZECOST = 2;
     var MOVECOST = 1;
     var CANVASWIDTH = 930;
     var CANVASHEIGHT = 558;
     var FARRESTPOINTOFCAMERA = 661;
     var MIDPOINTOFCAMERA = 200;
+    var BUILDSHIPCRACKCOST = 30;
+
     //endregion
     var game = new Phaser.Game(CANVASWIDTH, CANVASHEIGHT, Phaser.AUTO, 'game', { preload: preload, create: create, update: update, render: render });
     var cursors;
@@ -24,7 +26,10 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
     var firebaseGameRef;
     var player1CommandPointsText;
     var player2CommandPointsText;
+    var player1CrackText;
+    var player2CrackText;
 
+    var activePlayerCrack;
     var p;
 
     var lineGroup;
@@ -56,6 +61,11 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
     var player2CommandPointsSprite;
     var player1TurnEndedSprite;
     var player2TurnEndedSprite;
+    var player1CrackSprite;
+    var player2CrackSprite;
+
+    var player1Crack;
+    var player2Crack;
 
     $scope.game = {
         gameId: "",
@@ -113,6 +123,17 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
         player2TurnEndedSprite.fixedToCamera = true;
         player2TurnEndedText = game.add.text(CANVASWIDTH - 220, 35, $translate('TURNSTATE') + ": ", { font: '20px Arial', fill: '#9933FF'});
         player2TurnEndedSprite.addChild(player2TurnEndedText);
+
+
+        player1CrackSprite = game.add.sprite(0, 0);
+        player1CrackSprite.fixedToCamera = true;
+        player1CrackText = game.add.text(5, 55, $translate('CRACK') + ": ", { font: '20px Arial', fill: '#33CCFF'});
+        player1CrackSprite.addChild(player1CrackText);
+
+        player2CrackSprite = game.add.sprite(0, 0);
+        player2CrackSprite.fixedToCamera = true;
+        player2CrackText = game.add.text(CANVASWIDTH - 220, 55, $translate('CRACK') + ": ", { font: '20px Arial', fill: '#9933FF'});
+        player2CrackSprite.addChild(player2CrackText);
     }
 
     function update() {
@@ -133,8 +154,10 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
             btnEndTurn.bringToTop();
             player1TurnEndedSprite.bringToTop();
             player1CommandPointsSprite.bringToTop();
+            player1CrackSprite.bringToTop();
             player2TurnEndedSprite.bringToTop();
             player2CommandPointsSprite.bringToTop();
+            player2CrackSprite.bringToTop();
         }
 
     }
@@ -243,6 +266,9 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
     function miniShipListener(miniShipXSprite) {
         if (!$scope.activePlayerIsTurnEnded) {
             if ($scope.activePlayerCommandPoints >= BUILDSHIPCOST) {
+                if(activePlayerCrack >= BUILDSHIPCRACKCOST){
+
+
                 var action = {
                     gameId: $scope.game.gameId,
                     actionType: "BUILDSHIP",
@@ -253,6 +279,9 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
                 }, function () {
                     resetGame();
                 });
+                }else{
+                    showNotification($translate('INSUFFICIENTCRACK'), 2500)
+                }
             } else {
                 showNotification($translate('INSUFFICIENTCOMMANDPOINTS'), 2500);
             }
@@ -337,6 +366,8 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
         $scope.player2CommandPoints = gameData.player2.commandPoints;
         $scope.player1IsTurnEnded = gameData.player1.turnEnded;
         $scope.player2IsTurnEnded = gameData.player2.turnEnded;
+        player1Crack = gameData.player1.crack;
+        player2Crack = gameData.player2.crack;
         var player1IsActive = false;
         var player2IsActive = false;
 
@@ -348,7 +379,7 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
             $scope.game.activePlayerColonyImage = 'player1castle';
             $scope.activePlayerMiniShipImage = 'miniplayer1spaceship';
             $scope.activePlayerCommandPoints = $scope.player1CommandPoints;
-
+            activePlayerCrack = player1Crack;
             $scope.activePlayerIsTurnEnded = gameData.player1.turnEnded;
             otherTurnEnded = gameData.player2.turnEnded;
 
@@ -359,6 +390,7 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
             $scope.game.activePlayerColonyImage = 'player2castle';
             $scope.activePlayerMiniShipImage = 'miniplayer2spaceship';
             $scope.activePlayerCommandPoints = $scope.player2CommandPoints;
+            activePlayerCrack = player2Crack;
 
             $scope.activePlayerIsTurnEnded = gameData.player2.turnEnded;
             otherTurnEnded = gameData.player1.turnEnded;
@@ -475,6 +507,8 @@ spaceApp.controller("GameController", function ($scope, $templateCache, $transla
         player1TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player1IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));
         player2TurnEndedText.setText($translate('TURNSTATE') + ": " + ($scope.player2IsTurnEnded ? $translate('TURNENDEDSTATE') : $translate('TURNBUSYSTATE')));
 
+        player1CrackText.setText($translate('CRACK') + ": " + player1Crack);
+        player2CrackText.setText($translate('CRACK') + ": " + player2Crack);
     }
 
     function showNotification(string, delay) {

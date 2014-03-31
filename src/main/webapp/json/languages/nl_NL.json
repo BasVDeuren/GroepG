@@ -113,5 +113,8 @@
     "WINRATIO":"Win ratio",
     "NUMBER_OF_GAMES_PLAYED": "# Gespeelde spellen",
     "AVERAGE_AMOUNT_OF_COLONIES_PER_WIN": "Kolonies per win",
-    "AVERAGE_AMOUNT_OF_SHIPS_PER_WIN": "Schepen per win"
+    "AVERAGE_AMOUNT_OF_SHIPS_PER_WIN": "Schepen per win",
+    "CRACK": "Crack",
+    "INSUFFICIENTCRACK": "Onvoldoende Crack"
+
 }

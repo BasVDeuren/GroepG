@@ -17,6 +17,7 @@ public class PlayerViewModel {
     private boolean requestAccepted;
     private int profileId;
     private String playerName;
+    private int crack;
 
     public String getPlayerName() {
         return playerName;
@@ -80,5 +81,13 @@ public class PlayerViewModel {
 
     public void setTurnEnded(boolean turnEnded) {
         this.turnEnded = turnEnded;
+    }
+
+    public int getCrack() {
+        return crack;
+    }
+
+    public void setCrack(int crack) {
+        this.crack = crack;
     }
 }

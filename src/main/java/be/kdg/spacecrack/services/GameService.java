@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 @Component(value = "gameService")
 @Transactional
 public class GameService implements IGameService {
-    public static final int NEW_COLONY_STRENGHT = 1;
+
 
     @Autowired
     private IPlanetRepository planetRepository;
@@ -87,6 +87,9 @@ public class GameService implements IGameService {
 
         player1.setCommandPoints(START_COMMAND_POINTS);
         player2.setCommandPoints(START_COMMAND_POINTS);
+
+        player1.setCrack(PLAYER_START_CRACK);
+        player2.setCrack(PLAYER_START_CRACK);
 
         player1.setRequestAccepted(true);
         player2.setRequestAccepted(false);
@@ -176,9 +179,7 @@ public class GameService implements IGameService {
             }
             if (allTurnsEnded) {
                 for (Player p : players) {
-                    int commandPoints = p.getCommandPoints();
-                    p.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
-                    p.setTurnEnded(false);
+                    startNewTurn(p);
 
                 }
             }
@@ -187,6 +188,13 @@ public class GameService implements IGameService {
         }
 
         gameSynchronizer.updateGameConcurrent(game, oldActionNumber);
+    }
+
+    private void startNewTurn(Player p) {
+        int commandPoints = p.getCommandPoints();
+        p.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
+        p.getColonies().forEach(colony ->  p.addCrack(IGameService.CRACK_PER_COLONY));
+        p.setTurnEnded(false);
     }
 
     @Override
@@ -227,15 +235,19 @@ public class GameService implements IGameService {
         Player player = colony.getPlayer();
 
         Game game = player.getGame();
-        if (player.getCommandPoints() < BUILDSHIP_COST || player.isTurnEnded()) {
-            throw new SpaceCrackNotAcceptableException("Dear Sir or Lady, you have either run out of command points or your turn has ended, please wait for the other players to end their turn.");
+        if (player.getCommandPoints() < BUILDSHIP_COST) {
+            throw new SpaceCrackNotAcceptableException("Insufficient commandpoints.");
+        } else if (player.isTurnEnded()) {
+            throw new SpaceCrackNotAcceptableException("Your turn has ended.");
+        }else if(player.getCrack() < BUILDSHIP_CRACK_COST){
+            throw new SpaceCrackNotAcceptableException("Insufficient crack.");
         }
+
         Optional<Ship> shipOptional = player.getShips().stream().filter(s -> s.getGame_planet().getPlanet().getName().equals(colony.getGame_planet().getPlanet().getName())).findFirst();
 
         if (shipOptional.isPresent()) {
             shipOnPlanet = shipOptional.get();
         }
-
 
         if (shipOnPlanet == null) {
             Ship ship = new Ship();
@@ -247,6 +259,7 @@ public class GameService implements IGameService {
         }
 
         player.setCommandPoints(player.getCommandPoints() - BUILDSHIP_COST);
+        player.setCrack(player.getCrack()-BUILDSHIP_CRACK_COST);
         game.incrementActionNumber();
         gameSynchronizer.updateGame(game);
     }

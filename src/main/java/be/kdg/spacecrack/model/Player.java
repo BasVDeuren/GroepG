@@ -42,7 +42,8 @@ public class Player {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
     private List<Ship> ships = new ArrayList<Ship>();
 
-
+    @Column
+    private int crack;
 
     @Column(name = "commandPoints")
     private int commandPoints;
@@ -166,5 +167,18 @@ public class Player {
 
     public void internalSetProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public int getCrack() {
+        return crack;
+    }
+
+    public void setCrack(int crack) {
+        this.crack = crack;
+    }
+
+    public void addCrack(int crack) {
+        this.crack += crack;
+
     }
 }

@@ -18,7 +18,6 @@ import be.kdg.spacecrack.viewmodels.GameActivePlayerWrapper;
 import be.kdg.spacecrack.viewmodels.GameParameters;
 import be.kdg.spacecrack.viewmodels.ProfileWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,34 +69,43 @@ public abstract class BaseFilteredIntegrationTests {
     @Autowired
     protected ServletContext servletContext;
     protected WebApplicationContext ctx;
-
     @Autowired
-    SessionFactory sessionFactory;
-    private JavaMailSender mockMailSender;
+    protected IColonyRepository colonyRepository;
+    @Autowired
+    protected IGameRepository gameRepository;
+    @Autowired
+    protected IPlanetRepository planetRepository;
 
+    private JavaMailSender mockMailSender;
+    @Autowired
+    protected IPlayerRepository playerRepository;
+    @Autowired
+    protected IProfileRepository profileRepository;
+    @Autowired
+    protected IShipRepository shipRepository;
+    @Autowired
+    protected ITokenRepository tokenRepository;
+    @Autowired
+    protected IUserRepository userRepository;
+    @Autowired
+    protected PlanetConnectionRepository planetConnectionRepository;
+    @Autowired
+    protected GameRevisionRepository gameRevisionRepository;
     @Before
     public void setupMockMVC() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 
-        if(mvcBuilderWithoutGlobalExceptionHandler == null) {
-            IPlanetRepository planetRepository = new PlanetRepository(sessionFactory);
-            IColonyRepository colonyRepository = new ColonyRepository(sessionFactory);
-            IShipRepository shipRepository = new ShipRepository(sessionFactory);
-            IPlayerRepository playerRepository = new PlayerRepository(sessionFactory);
-            IGameRepository gameRepository = new GameRepository(sessionFactory);
-            IMapFactory mapFactory = new MapFactory(sessionFactory, planetRepository);
-            ITokenRepository tokenRepository = new TokenRepository(sessionFactory);
-            IProfileRepository profileRepository = new ProfileRepository(sessionFactory);
-            IUserRepository userRepository = new UserRepository(sessionFactory);
-            ITokenStringGenerator tokenStringGenerator = new TokenStringGenerator();
+        if (mvcBuilderWithoutGlobalExceptionHandler == null) {
 
+            IMapFactory mapFactory = new MapFactory(planetRepository, planetConnectionRepository);
+            ITokenStringGenerator tokenStringGenerator = new TokenStringGenerator();
             ViewModelConverter viewModelConverter = new ViewModelConverter();
             IFirebaseUtil firebaseUtil = mock(IFirebaseUtil.class);
             GameSynchronizer gameSynchronizer = new GameSynchronizer(viewModelConverter, firebaseUtil, gameRepository);
             IMoveShipHandler moveShipHandler = new MoveShipHandler(colonyRepository, planetRepository, gameSynchronizer, shipRepository);
 
             GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
-            IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, moveShipHandler, viewModelConverter, mockGameSynchronizer);
+            IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, moveShipHandler, viewModelConverter, mockGameSynchronizer, gameRevisionRepository);
             IAuthorizationService authorizationService = new AuthorizationService(tokenRepository, userRepository, tokenStringGenerator);
 
             mockMailSender = mock(JavaMailSender.class);
@@ -119,7 +127,7 @@ public abstract class BaseFilteredIntegrationTests {
             mockMvc = mvcBuilderWithoutGlobalExceptionHandler.build();
         }
 
-        if(objectMapper == null) {
+        if (objectMapper == null) {
             objectMapper = new ObjectMapper();
         }
     }
@@ -134,6 +142,7 @@ public abstract class BaseFilteredIntegrationTests {
         exceptionResolver.afterPropertiesSet();
         return exceptionResolver;
     }
+
     protected String loginAndRetrieveAccessToken() throws Exception {
         String username = "test";
         String password = "test";
@@ -202,6 +211,7 @@ public abstract class BaseFilteredIntegrationTests {
 
         return objectMapper.readValue(gameJson, GameActivePlayerWrapper.class);
     }
+
     private String getMD5HashedPassword(String testPassword) {
         MessageDigest md5;
         try {

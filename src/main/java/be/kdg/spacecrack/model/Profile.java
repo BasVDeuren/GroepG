@@ -67,7 +67,7 @@ public class Profile {
         this.lastname = lastname;
         this.dayOfBirth = dayOfBirth;
         this.image = image;
-        players = new ArrayList<Player>();
+        players = new ArrayList<>();
     }
 
     public String getFirstname() {

@@ -2,6 +2,9 @@ package be.kdg.spacecrack.repositories;
 
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,29 +15,30 @@ import java.util.List;
  * 2013-2014
  *
  */
-public interface IUserRepository {
+@Repository
+public interface IUserRepository extends JpaRepository<User, Integer> {
+    @Query("select u from User u where u.email = ?1 and u.password =?2")
+    User getUser(String email, String password);
 
-    User getUser(User user);
+    @Query("select u from User u where u.username = ?1")
+    User findUserByUsername(String username);
 
-    @Deprecated
-    User addUser(String username, String password, String email);
-
-    User getUserByUsername(String username);
-
-    void updateUser(User user);
-
-    void createUser(User user);
-
+    @Query("select u from User u where u.token = ?1")
     User getUserByAccessToken(AccessToken accessToken);
 
-    List<User> findUsersByUsernamePart(String username);
+    @Query("select u from User u where u.username LIKE CONCAT(?1,'%')")
+    List<User> findUsersByUsernamePart(String usernamePart);
 
-    List<User> findUsersByEmailPart(String username) ;
+    @Query("select u from User u where u.email LIKE CONCAT(?1, '%')")
+    List<User> findUsersByEmailPart(String emailPart);
 
+    @Query("select u from User u where u.token IS NOT NULL")
     List<User> getLoggedInUsers();
 
-
+    @Query("select u from User u where u.email = ?1")
     User getUserByEmail(String email);
 
+    //Todo: Service logic in repository
+    @Query("select u from User u where u.verificationToken = ?1 and u.verified = false")
     User findUserByVerificationTokenValue(String tokenValue);
 }

@@ -45,7 +45,7 @@ public class ProfileController {
         User user = tokenService.getUserByAccessTokenValue(accessTokenValue);
         Date date = new SimpleDateFormat("dd-MM-yyyy").parse(profileWrapper.getDayOfBirth());
 
-        Profile profile = profileService.getProfileByUser(user);
+        Profile profile = user.getProfile();
         profile.setFirstname(profileWrapper.getFirstname());
         profile.setLastname(profileWrapper.getLastname());
         profile.setDayOfBirth(date);

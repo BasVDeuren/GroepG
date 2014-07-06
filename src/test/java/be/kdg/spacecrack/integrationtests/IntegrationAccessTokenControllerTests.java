@@ -3,13 +3,13 @@ package be.kdg.spacecrack.integrationtests;
 
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.repositories.ITokenRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
-import be.kdg.spacecrack.repositories.TokenRepository;
-import be.kdg.spacecrack.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -34,12 +34,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class IntegrationAccessTokenControllerTests extends BaseFilteredIntegrationTests {
     private User testUser;
     private ObjectMapper objectMapper;
+    @Autowired
+    private ITokenRepository tokenRepository;
+    @Autowired
+    private IUserRepository userRepository;
 
     @Before
     public void setUp() throws Exception {
         objectMapper = new ObjectMapper();
-        IUserRepository repository = new UserRepository(sessionFactory);
-        testUser = repository.addUser("testUsername", "testPassword", "testEmail@gmail.com");
+        testUser = userRepository.save(new User("testUsername", "testPassword", "testEmail@gmail.com", true));
     }
 
     @Test
@@ -77,7 +80,7 @@ public class IntegrationAccessTokenControllerTests extends BaseFilteredIntegrati
     @Test
     public void login_InvalidUser_Unauthorized() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = post("/accesstokens").contentType(MediaType.APPLICATION_JSON).content("{\"username\":\"badUser\",\"password\":\"testPassword\"}").accept(MediaType.APPLICATION_JSON);
-       // MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
+        // MockMvc mockMvcWithoutGlobalExceptionHandler = mvcBuilderWithoutGlobalExceptionHandler.build();
         mockMvc.perform(requestBuilder).andExpect(status().isUnauthorized());
     }
 
@@ -91,12 +94,12 @@ public class IntegrationAccessTokenControllerTests extends BaseFilteredIntegrati
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userjson)
                 .accept(MediaType.APPLICATION_JSON));
-        UserRepository userRepository = new UserRepository(sessionFactory);
-        TokenRepository tokenRepository = new TokenRepository(sessionFactory);
 
-        AccessToken accessToken = tokenRepository.getAccessTokenByValue(userRepository.getUserByUsername(testUser.getUsername()).getToken().getValue());
 
-        tokenRepository.deleteAccessToken(accessToken);
+
+        AccessToken accessToken = tokenRepository.getAccessTokenByValue(userRepository.findUserByUsername(testUser.getUsername()).getToken().getValue());
+
+        tokenRepository.delete(accessToken);
 
         MockHttpServletRequestBuilder logoutRequestBuilder = delete("/accesstokens");
         mockMvc.perform(logoutRequestBuilder

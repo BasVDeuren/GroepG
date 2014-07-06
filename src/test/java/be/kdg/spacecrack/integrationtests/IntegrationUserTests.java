@@ -3,9 +3,6 @@ package be.kdg.spacecrack.integrationtests;
 import be.kdg.spacecrack.controllers.UserController;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.IUserRepository;
-import be.kdg.spacecrack.repositories.ProfileRepository;
-import be.kdg.spacecrack.repositories.TokenRepository;
-import be.kdg.spacecrack.repositories.UserRepository;
 import be.kdg.spacecrack.services.AuthorizationService;
 import be.kdg.spacecrack.services.UserService;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
@@ -13,11 +10,10 @@ import be.kdg.spacecrack.utilities.TokenStringGenerator;
 import be.kdg.spacecrack.viewmodels.UserViewModel;
 import be.kdg.spacecrack.viewmodels.VerificationTokenViewModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.internal.verification.VerificationModeFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,35 +41,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  */
 public class IntegrationUserTests extends BaseFilteredIntegrationTests {
-    private UserRepository userRepository;
-
-    @Before
-    public void setUp() throws Exception {
-        userRepository = new UserRepository(sessionFactory);
-    }
+    @Autowired
+    private IUserRepository userRepository;
 
     @Test
     public void testEditUser_validEditedUser_StatusOk() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-
-        Session session = sessionFactory.getCurrentSession();
-
         User testUser = new User("usernameTest²", "password", "email", true);
-        session.saveOrUpdate(testUser);
-
+        userRepository.save(testUser);
         String userjson = objectMapper.writeValueAsString(testUser);
-
         MockHttpServletRequestBuilder requestBuilder = post("/accesstokens");
         mockMvc.perform(requestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userjson)
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         String userMapperJsonValid = objectMapper.writeValueAsString(new UserViewModel("usernameTest", "password", "password", "newEmail"));
-
         MockHttpServletRequestBuilder putRequestBuilder = post("/auth/user");
-        String tokenOfEditedUser = userRepository.getUserByUsername(testUser.getUsername()).getToken().getValue();
+        String tokenOfEditedUser = userRepository.findUserByUsername(testUser.getUsername()).getToken().getValue();
         mockMvc.perform(putRequestBuilder
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(userMapperJsonValid)
@@ -92,7 +77,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         JavaMailSender mockMailSender = mock(JavaMailSender.class);
 
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
-        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
+        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, profileRepository, mockMailSender, mockTokenStringGenerator), new AuthorizationService(tokenRepository, mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
         stub(mockTokenStringGenerator.generateTokenString(6)).toReturn(testToken);
 
@@ -103,7 +88,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
                 .andExpect(status().isOk());
         ArgumentCaptor<MimeMessage> mimeMessageArgumentCaptor = ArgumentCaptor.forClass(MimeMessage.class);
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(mockUserRepository, VerificationModeFactory.times(1)).createUser(userArgumentCaptor.capture());
+        verify(mockUserRepository, VerificationModeFactory.times(1)).save(userArgumentCaptor.capture());
         User userArgument = userArgumentCaptor.getValue();
 
         assertEquals("User shouldn't be verified yet", userArgument.isVerified(), false);
@@ -181,7 +166,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         JavaMailSender mockMailSender = mock(JavaMailSender.class);
 
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
-        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
+        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, profileRepository, mockMailSender, mockTokenStringGenerator), new AuthorizationService(tokenRepository, mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
         stub(mockTokenStringGenerator.generateTokenString(32)).toReturn(testToken);
         stub(mockUserRepository.findUserByVerificationTokenValue(testToken)).toReturn(new User());
@@ -199,7 +184,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
                 .content(verificationTokenViewModelJSon))
                 .andExpect(status().isOk());
         ArgumentCaptor<User>  userArgumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(mockUserRepository, VerificationModeFactory.times(1)).updateUser(userArgumentCaptor.capture());
+        verify(mockUserRepository, VerificationModeFactory.times(2)).save(userArgumentCaptor.capture());
         assertTrue("The user should be verified",userArgumentCaptor.getValue().isVerified());
 
 
@@ -216,7 +201,7 @@ public class IntegrationUserTests extends BaseFilteredIntegrationTests {
         JavaMailSender mockMailSender = mock(JavaMailSender.class);
 
         ITokenStringGenerator mockTokenStringGenerator = mock(ITokenStringGenerator.class);
-        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, new ProfileRepository(sessionFactory), mockMailSender, mockTokenStringGenerator), new AuthorizationService(new TokenRepository(sessionFactory), mockUserRepository, new TokenStringGenerator()))).build();
+        MockMvc mockMvcStandalone = MockMvcBuilders.standaloneSetup(new UserController(new UserService(mockUserRepository, profileRepository, mockMailSender, mockTokenStringGenerator), new AuthorizationService(tokenRepository, mockUserRepository, new TokenStringGenerator()))).build();
         String testToken = "testToken123";
         stub(mockTokenStringGenerator.generateTokenString(32)).toReturn(testToken);
         String invalidtoken = "invalidtoken";

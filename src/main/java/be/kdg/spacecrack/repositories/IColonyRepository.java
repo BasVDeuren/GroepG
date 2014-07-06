@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.repositories;/* Git $Id
+package be.kdg.spacecrack.repositories;/* Git $Id$
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -8,16 +8,16 @@ package be.kdg.spacecrack.repositories;/* Git $Id
 
 import be.kdg.spacecrack.model.Colony;
 import be.kdg.spacecrack.model.Game;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface IColonyRepository {
+@Repository
+public interface IColonyRepository extends JpaRepository<Colony, Integer> {
 
+    @Query("select c from Colony c where c.player.game = ?1")
+    List<Colony> findColoniesByGame(Game game);
 
-    List<Colony> getColoniesByGame(Game game);
-
-    Colony getColonyById(Integer colonyId);
-
-
-    void delete(Colony colony);
 }

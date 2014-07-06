@@ -73,10 +73,6 @@ public class ActionController{
             throw new SpaceCrackNotAcceptableException("Unsupported action type");
         }
         action.execute();
-//        Game game = gameService.getGameByGameId(actionViewModel.getGameId());
-//        GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
-//
-//        firebaseUtil.setValue(GameController.GAMESUFFIX + gameViewModel.getGameId(), gameViewModel);
 
     }
 

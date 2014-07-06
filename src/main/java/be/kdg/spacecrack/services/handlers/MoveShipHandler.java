@@ -60,7 +60,7 @@ public class MoveShipHandler implements IMoveShipHandler {
         Game game = player.getGame();
         player.setCommandPoints(player.getCommandPoints() - GameService.MOVESHIPCOST);
 
-        List<Colony> colonies = colonyRepository.getColoniesByGame(game);
+        List<Colony> colonies = colonyRepository.findColoniesByGame(game);
 
         Optional<Colony> colonyOnPlanet = colonies.stream().filter(c -> colonyIsOnPlanet(c, destinationPlanet)).findFirst();
         if (colonyOnPlanet.isPresent()) {
@@ -292,7 +292,7 @@ public class MoveShipHandler implements IMoveShipHandler {
         }
 
         // Get all the other planets of the map (all planets - player colonies)
-        List<Planet> targetPlanets = new ArrayList<Planet>(Arrays.asList(planetRepository.getAll())); // all planets
+        List<Planet> targetPlanets = new ArrayList<Planet>(planetRepository.findAll()); // all planets
         targetPlanets.removeAll(playerPlanetsList); // all planets without already captured planets
 
         // Find chordless cycles of the graph

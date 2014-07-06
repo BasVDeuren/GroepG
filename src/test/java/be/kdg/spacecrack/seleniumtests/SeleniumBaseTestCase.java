@@ -6,7 +6,6 @@ package be.kdg.spacecrack.seleniumtests;/* Git $Id
  *
  */
 
-import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -16,7 +15,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -29,14 +27,14 @@ import java.util.concurrent.TimeUnit;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
 public abstract class SeleniumBaseTestCase {
-    @Autowired
-    protected SessionFactory sessionFactory;
+
     protected WebDriver driver;
-    protected String baseUrl="http://localhost:8080/#/";
+    protected String baseUrl="http://localhost:8081/#/";
 
     @Before
     public void setUp() throws Exception {
-        URL resource = this.getClass().getResource("/chromedriver.exe");
+        //Don't ask why i had to change this to chromedriver2.exe...
+        URL resource = this.getClass().getResource("/chromedriver2.exe");
         String path = resource.getPath();
         path = path.replaceAll("%20", " ");
         System.setProperty("webdriver.chrome.driver", path);
@@ -46,11 +44,6 @@ public abstract class SeleniumBaseTestCase {
     }
     protected void login() {
         driver.get(baseUrl);
-//        try {
-//            Thread.sleep(2000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement uname = driver.findElement(By.name("uname"));
         WebElement password = driver.findElement(By.name("password"));
@@ -58,13 +51,6 @@ public abstract class SeleniumBaseTestCase {
         password.sendKeys("test");
         WebElement loginbutton = driver.findElement(By.name("login"));
         loginbutton.click();
-
-//        uname = driver.findElement(By.name("uname"));
-//        password = driver.findElement(By.name("password"));
-//        uname.sendKeys("test@gmail.com");
-//        password.sendKeys("test");
-//        loginbutton = driver.findElement(By.name("login"));
-//        loginbutton.click();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.name("createGame")));
     }

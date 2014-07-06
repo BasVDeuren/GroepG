@@ -25,7 +25,8 @@ public class ProfileService implements IProfileService {
     @Autowired
     private IUserRepository userRepository;
 
-    public ProfileService() {}
+    public ProfileService() {
+    }
 
     public ProfileService(IProfileRepository profileRepository, IUserRepository userRepository) {
         this.profileRepository = profileRepository;
@@ -37,8 +38,8 @@ public class ProfileService implements IProfileService {
         if(user.getProfile() == null) {
             profile.setUser(user);
             user.setProfile(profile);
-            profileRepository.createProfile(profile);
-            userRepository.updateUser(user);
+            profileRepository.save(profile);
+            userRepository.save(user);
         } else {
             throw new SpaceCrackAlreadyExistsException();
         }
@@ -46,16 +47,12 @@ public class ProfileService implements IProfileService {
 
     @Override
     public void editProfile(Profile profile) throws Exception {
-        profileRepository.editContact(profile);
+        profileRepository.save(profile);
     }
 
-    @Override
-    public Profile getProfileByUser(User user) {
-        return profileRepository.getContact(user);
-    }
 
     @Override
     public Profile getProfileByProfileId(int profileId) {
-        return profileRepository.getProfileByProfileId(profileId);
+        return profileRepository.findOne(profileId);
     }
 }

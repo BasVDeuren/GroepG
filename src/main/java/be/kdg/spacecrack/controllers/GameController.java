@@ -96,8 +96,8 @@ public class GameController {
         User user = authorizationService.getUserByAccessTokenValue(accessTokenValue);
         Player player = gameService.getActivePlayer(user, game);
         GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
-        GameActivePlayerWrapper gameActivePlayerWrapper = new GameActivePlayerWrapper(gameViewModel, player.getPlayerId(), FirebaseUtil.FIREBASEURLBASE + GAMESUFFIX + game.getGameId());
-        firebaseUtil.setValue(GAMESUFFIX + game.getGameId(), gameViewModel);
+        GameActivePlayerWrapper gameActivePlayerWrapper = new GameActivePlayerWrapper(gameViewModel, player.getPlayerId(), FirebaseUtil.FIREBASEURLBASE + GAMESUFFIX + game.getId());
+        firebaseUtil.setValue(GAMESUFFIX + game.getId(), gameViewModel);
         return gameActivePlayerWrapper;
     }
 

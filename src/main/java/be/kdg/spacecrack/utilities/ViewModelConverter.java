@@ -24,7 +24,7 @@ public class ViewModelConverter implements IViewModelConverter {
     @Override
     public ColonyViewModel convertColonyToViewModel(Colony colony) {
         ColonyViewModel colonyViewModel = new ColonyViewModel();
-        colonyViewModel.setColonyId(colony.getColonyId());
+        colonyViewModel.setColonyId(colony.getId());
         colonyViewModel.setPlanetName(colony.getGame_planet().getPlanet().getName());
         colonyViewModel.setStrength(colony.getStrength());
         return colonyViewModel;
@@ -33,7 +33,7 @@ public class ViewModelConverter implements IViewModelConverter {
     @Override
     public GameViewModel convertGameToViewModel(Game game) {
         GameViewModel gameViewModel = new GameViewModel();
-        gameViewModel.setGameId(game.getGameId());
+        gameViewModel.setGameId(game.getId());
         gameViewModel.setName(game.getName());
         gameViewModel.setLoserPlayerId(game.getLoserPlayerId());
         gameViewModel.setActionNumber(game.getActionNumber());
@@ -104,7 +104,7 @@ public class ViewModelConverter implements IViewModelConverter {
     @Override
     public GameViewModel convertGameToReplayViewModel(Game game) {
         GameViewModel gameViewModel = new GameViewModel();
-        gameViewModel.setGameId(game.getGameId());
+        gameViewModel.setGameId(game.getId());
         gameViewModel.setName(game.getName());
         gameViewModel.setLoserPlayerId(game.getLoserPlayerId());
         gameViewModel.setActionNumber(game.getActionNumber());

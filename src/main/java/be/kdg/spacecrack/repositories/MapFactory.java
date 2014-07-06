@@ -11,35 +11,35 @@ import be.kdg.spacecrack.controllers.MapController;
 import be.kdg.spacecrack.model.Planet;
 import be.kdg.spacecrack.model.PlanetConnection;
 import be.kdg.spacecrack.model.SpaceCrackMap;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 @Service("mapFactory")
 @Transactional
 public class MapFactory implements IMapFactory {
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    private SessionFactory sessionFactory;
+
     @Autowired
     private IPlanetRepository planetRepository;
+    @Autowired
+    private PlanetConnectionRepository planetConnectionRepository;
 
-    public MapFactory() {}
+    public MapFactory() {
+    }
 
-    public MapFactory(SessionFactory sessionFactory, IPlanetRepository planetRepository) {
-        this.sessionFactory = sessionFactory;
+    public MapFactory(IPlanetRepository planetRepository, PlanetConnectionRepository planetConnectionRepository) {
         this.planetRepository = planetRepository;
+        this.planetConnectionRepository = planetConnectionRepository;
     }
 
     private void connectPlanetsByRadius(Planet[] planets, double radius) {
-        Session session = sessionFactory.getCurrentSession();
+
 
         for (int i = 0; i < planets.length; i++) {
             Planet checkPlanet = planets[i];
@@ -56,9 +56,9 @@ public class MapFactory implements IMapFactory {
                 if (checkPlanet != planet) {
                     if (distance < radius) {
                         PlanetConnection planetConnection = new PlanetConnection(checkPlanet, planet);
-                        session.saveOrUpdate(planetConnection);
+                        planetConnectionRepository.save(planetConnection);
                         checkPlanet.addConnection(planetConnection);
-                        session.saveOrUpdate(checkPlanet);
+                       planetRepository.save(checkPlanet);
                     }
                 }
             }
@@ -67,22 +67,21 @@ public class MapFactory implements IMapFactory {
     }
 
     private void connectPlanets(Planet p1, Planet p2) {
-        Session session = sessionFactory.getCurrentSession();
-
         PlanetConnection planetConnection = new PlanetConnection(p1, p2);
         p1.addConnection(planetConnection);
 
         planetConnection = new PlanetConnection(p2, p1);
         p2.addConnection(planetConnection);
 
-        session.saveOrUpdate(p1);
-        session.saveOrUpdate(p2);
+        planetRepository.save(p1);
+        planetRepository.save(p2);
     }
 
 
     @Override
     public SpaceCrackMap getSpaceCrackMap() {
-        Planet[] planets = planetRepository.getAll();
+        List<Planet> all = planetRepository.findAll();
+        Planet[] planets = all.toArray(new Planet[all.size()]);
         return new SpaceCrackMap(planets);
     }
 
@@ -197,7 +196,8 @@ public class MapFactory implements IMapFactory {
                 planet.setY((int) (planet.getY() * 2));
             }
 
-            planetRepository.createPlanets(planets);
+
+            planetRepository.save(Arrays.asList(planets));
 
             connectPlanetsByRadius(planets, 105 * 2);
             removeCrossingConnections(planets);
@@ -259,14 +259,14 @@ public class MapFactory implements IMapFactory {
             }
         }
 
-        Session session = sessionFactory.getCurrentSession();
+
 
         for (PlanetConnection connection : connectionsToRemove) {
             connection.getParentPlanet().removeConnectionToPlanet(connection.getChildPlanet());
             connection.getChildPlanet().removeConnectionToPlanet(connection.getParentPlanet());
 
-            session.saveOrUpdate(connection.getParentPlanet());
-            session.saveOrUpdate(connection.getChildPlanet());
+            planetRepository.save(connection.getParentPlanet());
+            planetRepository.save(connection.getChildPlanet());
         }
     }
 }

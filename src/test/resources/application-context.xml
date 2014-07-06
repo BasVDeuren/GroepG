@@ -3,14 +3,17 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:rep="http://www.springframework.org/schema/data/jpa"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx.xsd">
-
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/data/jpa
+    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    <rep:repositories base-package="be.kdg.spacecrack.repositories" />
     <tx:annotation-driven/>
     <context:component-scan base-package="be.kdg.spacecrack.validators"/>
     <context:component-scan
@@ -46,47 +49,30 @@
         </property>
     </bean>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"></property>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.hbm2ddl.auto">create</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
-                <prop key="hibernate.show_sql">true</prop>
-                <prop key="javax.persistence.validation.mode">none</prop>
+    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceUnitName" value="JpaPersistenceUnit"/>
+        <property name="jpaProperties">
+        <props>
+        <prop key="hibernate.hbm2ddl.auto">create</prop>
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+        <prop key="hibernate.show_sql">true</prop>
+        <prop key="javax.persistence.validation.mode">none</prop>
 
-                <prop key="org.hibernate.envers.auditTablePrefix">AUD_</prop>
-                <prop key="org.hibernate.envers.auditTableSuffix"></prop>
-                <prop key="org.hibernate.envers.storeDataAtDelete">true</prop>
-                <prop key="hibernate.ejb.event.post-insert">
-                    org.hibernate.ejb.event.EJB3PostInsertEventListener,org.hibernate.envers.event.AuditEventListener
-                </prop>
-                <prop key="hibernate.ejb.event.post-update">
-                    org.hibernate.ejb.event.EJB3PostUpdateEventListener,org.hibernate.envers.event.AuditEventListener
-                </prop>
-                <prop key="hibernate.ejb.event.post-delete">
-                    org.hibernate.ejb.event.EJB3PostDeleteEventListener,org.hibernate.envers.event.AuditEventListener
-                </prop>
-                <prop key="hibernate.ejb.event.pre-collection-update">
-                    org.hibernate.envers.event.AuditEventListener
-                </prop>
-                <prop key="hibernate.ejb.event.pre-collection-remove">
-                    org.hibernate.envers.event.AuditEventListener
-                </prop>
-                <prop key="hibernate.ejb.event.post-collection-recreate">
-                    org.hibernate.envers.event.AuditEventListener
-                </prop>
+        <prop key="org.hibernate.envers.auditTablePrefix">AUD_</prop>
+        <prop key="org.hibernate.envers.auditTableSuffix"></prop>
+        <prop key="org.hibernate.envers.storeDataAtDelete">true</prop>
 
-
-            </props>
+        </props>
         </property>
         <property name="packagesToScan" value="be.kdg.spacecrack.model"/>
     </bean>
 
+
     <bean id="transactionManager"
-          class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager"
           p:nestedTransactionAllowed="true"
-          p:sessionFactory-ref="sessionFactory">
+          p:entityManagerFactory-ref="entityManagerFactory">
     </bean>
 </beans>
 

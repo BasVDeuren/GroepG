@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -53,10 +52,21 @@ public class GameService implements IGameService {
     @Autowired
     private IGameSynchronizer gameSynchronizer;
 
+    @Autowired
+    private GameRevisionRepository gameRevisionRepository;
+
     public GameService() {
     }
 
-    public GameService(IPlanetRepository planetRepository, IColonyRepository colonyRepository, IShipRepository shipRepository, IPlayerRepository playerRepository, IGameRepository gameRepository, IMoveShipHandler moveShipHandler, IViewModelConverter viewModelConverter, IGameSynchronizer gameSynchronizer) {
+    public GameService(IPlanetRepository planetRepository,
+                       IColonyRepository colonyRepository,
+                       IShipRepository shipRepository,
+                       IPlayerRepository playerRepository,
+                       IGameRepository gameRepository,
+                       IMoveShipHandler moveShipHandler,
+                       IViewModelConverter viewModelConverter,
+                       IGameSynchronizer gameSynchronizer,
+                       GameRevisionRepository gameRevisionRepository) {
         this.planetRepository = planetRepository;
         this.shipRepository = shipRepository;
         this.colonyRepository = colonyRepository;
@@ -65,20 +75,22 @@ public class GameService implements IGameService {
         this.moveShipHandler = moveShipHandler;
         this.viewModelConverter = viewModelConverter;
         this.gameSynchronizer = gameSynchronizer;
+
+        this.gameRevisionRepository = gameRevisionRepository;
     }
 
     @Override
     public int createGame(Profile userProfile, String gameName, Profile opponentProfile) {
         Game game = new Game();
 
-        Planet[] planetsArray = planetRepository.getAll();
-        List<Planet> planets = Arrays.asList(planetsArray);
+
+        List<Planet> planets = planetRepository.findAll();
 
         planets.forEach(planet -> {
           Game_Planet game_planet = new Game_Planet(planet);
           game.addGame_Planet(game_planet);
-
         });
+
         Player player1 = new Player();
         Player player2 = new Player();
 
@@ -96,9 +108,6 @@ public class GameService implements IGameService {
 
         player1.setGame(game);
         player2.setGame(game);
-
-        Planet planetA = planetRepository.getPlanetByName("a");
-        Planet planetA3 = planetRepository.getPlanetByName("a3");
 
         Optional<Game_Planet> game_planetAOptional = game.getGamePlanets().stream().filter(gp -> gp.getPlanet().getName().equals("a")).findFirst();
         Optional<Game_Planet> game_planetA3Optional = game.getGamePlanets().stream().filter(gp -> gp.getPlanet().getName().equals("a3")).findFirst();
@@ -127,14 +136,14 @@ public class GameService implements IGameService {
 
         game.setName(gameName);
 
-        gameRepository.createOrUpdateGame(game);
+        Game savedGame = gameRepository.save(game);
 
-        return game.getGameId();
+        return savedGame.getId();
     }
 
     @Override
     public void moveShip(Integer shipId, String planetName) {
-        Ship ship = shipRepository.getShipByShipId(shipId);
+        Ship ship = shipRepository.findOne(shipId);
         Game game = ship.getPlayer().getGame();
         Planet destinationPlanet = planetRepository.getPlanetByName(planetName);
         validateActionMakeSureGameIsNotFinishedYet(game);
@@ -154,15 +163,15 @@ public class GameService implements IGameService {
 
     @Override
     public Planet getShipLocationByShipId(int shipId) {
-        Ship shipDb = shipRepository.getShipByShipId(shipId);
+        Ship shipDb = shipRepository.findOne(shipId);
         return shipDb.getGame_planet().getPlanet();
     }
 
     @Override
     public void endTurn(Integer playerID) {
-        Player player = playerRepository.getPlayerByPlayerId(playerID);
+        Player player = playerRepository.findOne(playerID);
 
-        Game game = gameRepository.getGameByGameId(player.getGame().getGameId());
+        Game game = gameRepository.findOne(player.getGame().getId());
         Integer oldActionNumber = game.getActionNumber();
 
 
@@ -204,7 +213,7 @@ public class GameService implements IGameService {
 
     @Override
     public Game getGameByGameId(int gameId) {
-        return gameRepository.getGameByGameId(gameId);
+        return gameRepository.findOne(gameId);
     }
 
     private void checkLost(Game gameByGameId) {
@@ -231,7 +240,7 @@ public class GameService implements IGameService {
     public void buildShip(Integer colonyId) {
         Ship shipOnPlanet = null;
 
-        Colony colony = colonyRepository.getColonyById(colonyId);
+        Colony colony = colonyRepository.findOne(colonyId);
         Player player = colony.getPlayer();
 
         Game game = player.getGame();
@@ -264,18 +273,15 @@ public class GameService implements IGameService {
         gameSynchronizer.updateGame(game);
     }
 
-
     @Override
     public List<Integer> getRevisionNumbers(int gameId) {
-        return gameRepository.getRevisionNumbers(gameId);
+        return gameRevisionRepository.getRevisionNumbers(gameId);
     }
-
 
     @Override
     public GameViewModel getGameRevisionByNumber(int gameId, Number number) {
-        Game gameRevision = gameRepository.getGameRevision(number, gameId);
+        Game gameRevision = gameRevisionRepository.getGameRevision(number, gameId);
         return viewModelConverter.convertGameToReplayViewModel(gameRevision);
-
     }
 
     @Override
@@ -289,7 +295,7 @@ public class GameService implements IGameService {
 
     @Override
     public void deleteGame(int gameId) {
-        gameRepository.deleteGame(gameId);
+        gameRepository.delete(gameId);
     }
 
 

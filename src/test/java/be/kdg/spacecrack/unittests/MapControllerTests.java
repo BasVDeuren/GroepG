@@ -4,8 +4,9 @@ import be.kdg.spacecrack.controllers.MapController;
 import be.kdg.spacecrack.model.Planet;
 import be.kdg.spacecrack.model.PlanetConnection;
 import be.kdg.spacecrack.repositories.MapFactory;
-import be.kdg.spacecrack.repositories.PlanetRepository;
+import be.kdg.spacecrack.repositories.PlanetConnectionRepository;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -22,10 +23,12 @@ import static org.junit.Assert.assertEquals;
  *
  */
 public class MapControllerTests extends BaseUnitTest {
+    @Autowired
+    private PlanetConnectionRepository planetConnectionRepository;
     @Test
     @Transactional
     public void getMap_valid_AllPlanetsConnected() throws Exception {
-        MapController mapController = new MapController(new MapFactory(sessionFactory,new PlanetRepository(sessionFactory)));
+        MapController mapController = new MapController(new MapFactory(planetRepository, planetConnectionRepository));
         Planet[] planets = mapController.getMap().getPlanets();
         Planet startPlanet = planets[0];
 

@@ -30,14 +30,14 @@ public class SeleniumEditProfileTests extends SeleniumBaseTestCase {
         WebElement firstNameTextBox = driver.findElement(By.id("firstname"));
         wait.until(ExpectedConditions.visibilityOf(firstNameTextBox));
 
-        assertEquals("http://localhost:8080/#/spacecrack/editProfile", driver.getCurrentUrl());
+        assertEquals(baseUrl+ "spacecrack/editProfile", driver.getCurrentUrl());
 
         WebElement lnkpssword = driver.findElement(By.linkText("Change password"));
         lnkpssword.click();
 
         WebElement passwordTextBox = driver.findElement(By.id("new_password"));
         wait.until(ExpectedConditions.visibilityOf(passwordTextBox));
-        assertEquals("http://localhost:8080/#/spacecrack/editProfile", driver.getCurrentUrl());
+        assertEquals(baseUrl +"spacecrack/editProfile", driver.getCurrentUrl());
 
         WebElement lnkProfile = driver.findElement(By.linkText("Profile"));
         lnkProfile.click();
@@ -45,7 +45,7 @@ public class SeleniumEditProfileTests extends SeleniumBaseTestCase {
         firstNameTextBox = driver.findElement(By.id("firstname"));
         wait.until(ExpectedConditions.visibilityOf(firstNameTextBox));
 
-        assertEquals("http://localhost:8080/#/spacecrack/editProfile", driver.getCurrentUrl());
+        assertEquals(baseUrl +"spacecrack/editProfile", driver.getCurrentUrl());
     }
 
     @Test

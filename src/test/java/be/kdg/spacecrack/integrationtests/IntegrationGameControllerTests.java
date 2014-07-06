@@ -19,10 +19,7 @@ import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import javax.servlet.http.Cookie;
-import java.util.List;
-
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -188,89 +185,5 @@ public class IntegrationGameControllerTests extends BaseFilteredIntegrationTests
         verify(mockGameService, VerificationModeFactory.times(1)).buildShip(colonyViewModel.getColonyId());
     }
 
-    //TODO: This test now fails because of transactionality, the functionality still works though
-  /*  @Test
-    public void postActionMoveShip_DestroyLastColonyOfPlayer2_Player2Lost() throws Exception {
-        String accessToken = loginAndRetrieveAccessToken();
-        GameActivePlayerWrapper gameActivePlayerWrapper = createAGame(accessToken);
-        GameViewModel game = gameActivePlayerWrapper.getGame();
 
-        PlayerViewModel playerViewModel = game.getPlayer1();
-        List<ShipViewModel> playerViewModelShips = playerViewModel.getShips();
-
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "b");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "d");
-
-        endTurn(accessToken, game, game.getPlayer1());
-        endTurn(accessToken, game, game.getPlayer2());
-
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "j");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "p");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "q");
-
-        endTurn(accessToken, game, game.getPlayer1());
-        endTurn(accessToken, game, game.getPlayer2());
-
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "q3");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "p3");
-
-        endTurn(accessToken, game, game.getPlayer1());
-        endTurn(accessToken, game, game.getPlayer2());
-
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "j3");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "d3");
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "b3");
-
-        endTurn(accessToken, game, game.getPlayer1());
-        endTurn(accessToken, game, game.getPlayer2());
-
-        String gameActivePlayerWrapperJson = mockMvc.perform(get("/auth/game/specificGame/" + game.getGameId())
-                .accept(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("accessToken", accessToken))).andReturn().getResponse().getContentAsString();
-
-        gameActivePlayerWrapper = objectMapper.readValue(gameActivePlayerWrapperJson, GameActivePlayerWrapper.class);
-        game = gameActivePlayerWrapper.getGame();
-        List<ColonyViewModel> colonies = game.getPlayer1().getColonies();
-        buildShip(accessToken, playerViewModel, game, colonies.get(colonies.size() - 1));
-
-        moveShip(accessToken, game, playerViewModel, playerViewModelShips, "a3");
-
-        gameActivePlayerWrapperJson = mockMvc.perform(get("/auth/game/specificGame/" + game.getGameId())
-                .accept(MediaType.APPLICATION_JSON)
-                .cookie(new Cookie("accessToken", accessToken))).andReturn().getResponse().getContentAsString();
-
-        gameActivePlayerWrapper = objectMapper.readValue(gameActivePlayerWrapperJson, GameActivePlayerWrapper.class);
-
-        assertEquals("Player2 should have lost.", game.getPlayer2().getPlayerId(), gameActivePlayerWrapper.getGame().getLoserPlayerId());
-    }*/
-
-    private void endTurn(String accessToken, GameViewModel game, PlayerViewModel player) throws Exception {
-        ActionViewModel actionViewModel = new ActionViewModel("ENDTURN", null, null, null, player.getPlayerId(), game.getGameId());
-
-        mockMvc.perform(post("/auth/action")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(actionViewModel))
-                .cookie(new Cookie("accessToken", accessToken)));
-    }
-
-    private void buildShip(String accessToken, PlayerViewModel player, GameViewModel game, ColonyViewModel colony) throws Exception {
-        ActionViewModel actionViewModel = new ActionViewModel("BUILDSHIP", null, null, colony, player.getPlayerId(), game.getGameId());
-
-        mockMvc.perform(post("/auth/action")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(actionViewModel))
-                .cookie(new Cookie("accessToken", accessToken)));
-    }
-
-    private void moveShip(String accessToken, GameViewModel game, PlayerViewModel playerViewModel, List<ShipViewModel> playerViewModelShips, String destinationPlanetName) throws Exception {
-        ActionViewModel actionViewModel = new ActionViewModel("MOVESHIP", playerViewModelShips.get(0), destinationPlanetName, null, playerViewModel.getPlayerId(), game.getGameId());
-
-        mockMvc.perform(post("/auth/action")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(actionViewModel))
-            .cookie(new Cookie("accessToken", accessToken)));
-    }
 }

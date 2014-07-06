@@ -23,7 +23,8 @@ public class GameSynchronizer implements IGameSynchronizer {
     @Autowired
     private IGameRepository gameRepository;
 
-    GameSynchronizer() {}
+    GameSynchronizer() {
+    }
 
     public GameSynchronizer(IViewModelConverter viewModelConverter, IFirebaseUtil firebaseUtil, IGameRepository gameRepository) {
         this.viewModelConverter = viewModelConverter;
@@ -33,7 +34,7 @@ public class GameSynchronizer implements IGameSynchronizer {
 
     @Override
     public void updateGame(Game game) {
-        gameRepository.updateGame(game);
+        gameRepository.save(game);
         GameViewModel gameViewModel = viewModelConverter.convertGameToViewModel(game);
         firebaseUtil.setValue(GameController.GAMESUFFIX + gameViewModel.getGameId(), gameViewModel);
 
@@ -41,12 +42,17 @@ public class GameSynchronizer implements IGameSynchronizer {
 
     @Override
     public void updateGameConcurrent(Game game, Integer actionNumber) {
-        boolean success = gameRepository.updateGameOptimisticConcurrent(game, actionNumber);
+        boolean success;
+        if (gameRepository.getGameOptimisticConcurrent(game.getId(), actionNumber) != null) {
+            success = true;
+        }else{
+            success = false;
+        }
         GameViewModel firebaseResult;
         if (success) {
             firebaseResult = viewModelConverter.convertGameToViewModel(game);
         } else {
-            Game gameFromDb = gameRepository.getGameByGameId(game.getGameId());
+            Game gameFromDb = gameRepository.findOne(game.getId());
             firebaseResult = viewModelConverter.convertGameToViewModel(gameFromDb);
         }
 

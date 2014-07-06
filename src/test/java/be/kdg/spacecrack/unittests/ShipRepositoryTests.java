@@ -10,25 +10,25 @@ import be.kdg.spacecrack.model.Game;
 import be.kdg.spacecrack.model.Game_Planet;
 import be.kdg.spacecrack.model.Player;
 import be.kdg.spacecrack.model.Ship;
-import be.kdg.spacecrack.repositories.GameRepository;
 import be.kdg.spacecrack.repositories.IGameRepository;
 import be.kdg.spacecrack.repositories.IShipRepository;
-import be.kdg.spacecrack.repositories.ShipRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertNotNull;
 
 
 public class ShipRepositoryTests extends  BaseUnitTest{
+    @Autowired
     private IShipRepository shipRepository;
-    IGameRepository gameRepository;
+    @Autowired
+    private IGameRepository gameRepository;
 
     @Before
     public void setUp() throws Exception {
-        shipRepository = new ShipRepository(sessionFactory);
-        gameRepository = new GameRepository(sessionFactory);
+
     }
 
     @Test
@@ -50,12 +50,12 @@ public class ShipRepositoryTests extends  BaseUnitTest{
         //Create Ship and add to player
         player.addShip(ship);
         //Create the game in the database
-        int gameId = gameRepository.createOrUpdateGame(game);
-        Game gameDb = gameRepository.getGameByGameId(gameId);
+        int gameId = gameRepository.save(game).getId();
+        Game gameDb = gameRepository.findOne(gameId);
         //endregion
 
         //region Act
-         Ship result = shipRepository.getShipByShipId(gameDb.getPlayers().get(0).getShips().get(0).getShipId());
+         Ship result = shipRepository.findOne(gameDb.getPlayers().get(0).getShips().get(0).getShipId());
         //endregion
 
         //Assert

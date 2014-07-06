@@ -30,24 +30,21 @@ public class GameSynchronizerTest {
         Game game = new Game();
         String updatedGameName = "updatedGame";
         game.setName(updatedGameName);
+
         Game dbGame= new Game();
         dbGame.setName("dbGame");
 
         Integer oldActionNumber = 1;
-        stub(mockGameRepository.updateGameOptimisticConcurrent(game, oldActionNumber)).toReturn(true);
-        stub(mockGameRepository.getGameByGameId(any(Integer.class))).toReturn(dbGame);
+        stub(mockGameRepository.getGameOptimisticConcurrent(game.getId(), oldActionNumber)).toReturn(game);
+        stub(mockGameRepository.findOne(any(Integer.class))).toReturn(dbGame);
         stub(mockViewModelConverter.convertGameToViewModel(any(Game.class))).toReturn(new GameViewModel());
-
-
         //Act
-
         gameSynchronizer.updateGameConcurrent(game, oldActionNumber);
-
         //Assert
         ArgumentCaptor<Game> gameArgumentCaptor = ArgumentCaptor.forClass(Game.class);
         verify(mockViewModelConverter, VerificationModeFactory.times(1)).convertGameToViewModel(gameArgumentCaptor.capture());
         Game value = gameArgumentCaptor.getValue();
-        assertEquals(value.getName(), updatedGameName );
+        assertEquals(value.getName(), updatedGameName);
     }
 
     @Test
@@ -65,8 +62,8 @@ public class GameSynchronizerTest {
         dbGame.setName(dbGameName);
 
         Integer oldActionNumber = 1;
-        stub(mockGameRepository.updateGameOptimisticConcurrent(game, oldActionNumber)).toReturn(false);
-        stub(mockGameRepository.getGameByGameId(any(Integer.class))).toReturn(dbGame);
+        stub(mockGameRepository.getGameOptimisticConcurrent(game.getId(), oldActionNumber)).toReturn(null);
+        stub(mockGameRepository.findOne(any(Integer.class))).toReturn(dbGame);
         stub(mockViewModelConverter.convertGameToViewModel(any(Game.class))).toReturn(new GameViewModel());
 
         //Act

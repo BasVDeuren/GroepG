@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service("mailService")
 public class MailService implements IMailService {
-    public static final String SPACECRACKWEBSITEURL = "http://localhost:8080/#/";
+    public static final String SPACECRACKWEBSITEURL = "http://localhost:8081/#/";
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private MailSender mailSender;

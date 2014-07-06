@@ -14,7 +14,6 @@ import be.kdg.spacecrack.model.Profile;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
-import be.kdg.spacecrack.repositories.ProfileRepository;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
 import be.kdg.spacecrack.utilities.TokenStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,7 @@ public class UserService implements IUserService {
         tokenStringGenerator = new TokenStringGenerator();
     }
 
-    public UserService(IUserRepository userRepository, ProfileRepository profileRepository, JavaMailSender mailSender, ITokenStringGenerator tokenStringGenerator) {
+    public UserService(IUserRepository userRepository, IProfileRepository profileRepository, JavaMailSender mailSender, ITokenStringGenerator tokenStringGenerator) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.mailSender = mailSender;
@@ -66,12 +65,12 @@ public class UserService implements IUserService {
 
     @Override
     public User getUserByUsername(String username) throws Exception {
-        return userRepository.getUserByUsername(username);
+        return userRepository.findUserByUsername(username);
     }
 
     @Override
     public void registerUser(String username, String password, String email) {
-        User userByUsername = userRepository.getUserByUsername(username);
+        User userByUsername = userRepository.findUserByUsername(username);
         if (userByUsername != null) {
             throw new SpaceCrackAlreadyExistsException();
         }
@@ -86,7 +85,7 @@ public class UserService implements IUserService {
         profile.setUser(user);
         user.setProfile(profile);
         user.setVerificationToken(tokenStringGenerator.generateTokenString(6));
-        userRepository.createUser(user);
+        userRepository.save(user);
         MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(System.getProperties()));
         try {
             mimeMessage.setContent(
@@ -99,7 +98,7 @@ public class UserService implements IUserService {
                             "<p>Press this link to confirm your registration to Spacecrack : " +
                             "</p>" +
                             "<p>" +
-                            "<a href=\"http://localhost:8080/#/verify\">Verify your registration here</a>" +
+                            "<a href=\"http://localhost:8081/#/verify\">Verify your registration here</a>" +
                             "</p>" +
                             "<p></p>" +
                             "<p>Have fun playing spacecrack!" +
@@ -121,7 +120,7 @@ public class UserService implements IUserService {
     @Override
     public void registerFacebookUser(String username, String password, String email)  {
 
-        User userByUsername = userRepository.getUserByUsername(username);
+        User userByUsername = userRepository.findUserByUsername(username);
         if(userByUsername != null)
         {
             throw new SpaceCrackAlreadyExistsException();
@@ -140,16 +139,16 @@ public class UserService implements IUserService {
         if(user.getProfile() == null){
             profile.setUser(user);
             user.setProfile(profile);
-            profileRepository.createProfile(profile);
-            userRepository.updateUser(user);
+            profileRepository.save(profile);
+            userRepository.save(user);
 
         }
-        userRepository.createUser(user);
+        userRepository.save(user);
     }
 
     @Override
     public void updateUser(User user) {
-        userRepository.updateUser(user);
+        userRepository.save(user);
     }
 
     @Override
@@ -181,6 +180,6 @@ public class UserService implements IUserService {
             throw new SpaceCrackNotAcceptableException("invalid verificationToken");
         }
         user.setVerified(true);
-        userRepository.updateUser(user);
+        userRepository.save(user);
     }
 }

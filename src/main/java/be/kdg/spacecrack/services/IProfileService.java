@@ -14,7 +14,5 @@ public interface IProfileService {
 
     void editProfile(Profile profile) throws Exception;
 
-    Profile getProfileByUser(User user);
-
     Profile getProfileByProfileId(int profileId);
 }

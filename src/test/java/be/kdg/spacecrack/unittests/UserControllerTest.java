@@ -5,8 +5,8 @@ import be.kdg.spacecrack.Exceptions.SpaceCrackUnauthorizedException;
 import be.kdg.spacecrack.controllers.UserController;
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
-import be.kdg.spacecrack.repositories.ProfileRepository;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IUserService;
 import be.kdg.spacecrack.services.UserService;
@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,8 @@ public class UserControllerTest extends BaseUnitTest {
     private IUserService userService;
     private ObjectMapper objectMapper;
     private UserController userController;
+    @Autowired
+    private IProfileRepository profileRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -61,9 +64,9 @@ public class UserControllerTest extends BaseUnitTest {
 
 
         UserViewModel userWrapper = new UserViewModel("username", "password", "password", "email");
-        UserController userController1 = new UserController(new UserService(userRepository, new ProfileRepository(sessionFactory), mock(JavaMailSender.class)), tokenService);
+        UserController userController1 = new UserController(new UserService(userRepository, profileRepository, mock(JavaMailSender.class)), tokenService);
          userController1.registerUser(userWrapper);
-        verify(userRepository, VerificationModeFactory.times(1)).createUser(any(User.class));
+        verify(userRepository, VerificationModeFactory.times(1)).save(any(User.class));
     }
 
     @Test(expected = SpaceCrackNotAcceptableException.class)

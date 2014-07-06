@@ -1,7 +1,8 @@
 package be.kdg.spacecrack.repositories;
 
 import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /* Git $Id$
  *
@@ -10,12 +11,8 @@ import be.kdg.spacecrack.model.User;
  * 2013-2014
  *
  */
-public interface IProfileRepository {
-    public void createProfile(Profile profile);
+@Repository
+public interface IProfileRepository extends JpaRepository<Profile, Integer>{
 
-    public Profile getContact(User user);
 
-    void editContact(Profile profile);
-
-    Profile getProfileByProfileId(int profileId);
 }

@@ -20,7 +20,7 @@ import java.util.List;
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
-    private int gameId;
+    private int id;
 
     @Column
     private String name;
@@ -29,9 +29,7 @@ public class Game {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
     private List<Player> players = new ArrayList<Player>();
 
-    @Version
-    @Column
-    private int versionNumber;
+
     @Column
     private int actionNumber;
 
@@ -54,12 +52,12 @@ public class Game {
        players = new ArrayList<Player>();
     }
 
-    public int getGameId() {
-        return gameId;
+    public int getId() {
+        return id;
     }
 
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
+    public void setId(int gameId) {
+        this.id = gameId;
     }
 
     public List<Player> getPlayers() {

@@ -7,9 +7,10 @@ package be.kdg.spacecrack.repositories;/* Git $Id
  */
 
 import be.kdg.spacecrack.model.Ship;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface IShipRepository {
-    Ship getShipByShipId(int shipId);
+@Repository
+public interface IShipRepository extends JpaRepository<Ship, Integer> {
 
-    void delete(Ship ship);
 }

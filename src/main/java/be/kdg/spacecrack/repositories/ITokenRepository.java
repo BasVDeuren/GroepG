@@ -1,7 +1,9 @@
 package be.kdg.spacecrack.repositories;
 
 import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 /* Git $Id$
  *
@@ -10,11 +12,11 @@ import be.kdg.spacecrack.model.User;
  * 2013-2014
  *
  */
-public interface ITokenRepository {
+@Repository
+public interface ITokenRepository extends JpaRepository<AccessToken, Integer> {
 
+    @Query("Select accessToken from AccessToken accessToken where accessToken.value = ?1")
     AccessToken getAccessTokenByValue(String value);
 
-    void saveAccessToken(User dbUser, AccessToken accessToken);
-
-    void deleteAccessToken(AccessToken accessToken);
+;
 }

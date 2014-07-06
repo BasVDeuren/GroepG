@@ -73,14 +73,14 @@ public class AuthorizationService implements IAuthorizationService {
             User user = new User(testUsername, testPassword, testemail, true);
             user.setProfile(profile);
             profile.setUser(user);
-            userRepository.createUser(user);
+            userRepository.save(user);
         }
     }
 
     @Override
     public AccessToken login(User user) {
         User dbUser;
-        dbUser = userRepository.getUser(user);
+        dbUser = userRepository.getUser(user.getEmail(), user.getPassword() );
         if (dbUser == null || !dbUser.isVerified()) {
             throw new SpaceCrackUnauthorizedException();
         }
@@ -93,7 +93,7 @@ public class AuthorizationService implements IAuthorizationService {
             accessToken.setUser(dbUser);
             dbUser.setToken(accessToken);
 
-            tokenRepository.saveAccessToken(dbUser, accessToken);
+            tokenRepository.save(accessToken);
         }
         return accessToken;
     }
@@ -102,9 +102,19 @@ public class AuthorizationService implements IAuthorizationService {
 
     @Override
     public void logout(String accessTokenValue) {
+
+        System.out.println("1: in logout");
         AccessToken accessToken = tokenRepository.getAccessTokenByValue(accessTokenValue);
+
         if(accessToken != null) {
-            tokenRepository.deleteAccessToken(accessToken);
+            System.out.println("2: accesstoken retrieved, value = " + accessToken.getValue());
+            User user = userRepository.getUserByAccessToken(accessToken);
+            user.setToken(null);
+
+
+            tokenRepository.delete(accessToken);
+            userRepository.save(user);
+            System.out.println("3: Deleted accesstoken");
         }
     }
 

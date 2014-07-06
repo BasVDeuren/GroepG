@@ -29,18 +29,18 @@ public class Player {
     @GeneratedValue
     private int playerId;
 
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @ManyToOne( fetch = FetchType.EAGER)
+
+    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "profileId")
     private Profile profile;
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Colony> colonies = new ArrayList<Colony>();
+    private List<Colony> colonies = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
-    private List<Ship> ships = new ArrayList<Ship>();
+    private List<Ship> ships = new ArrayList<>();
 
     @Column
     private int crack;

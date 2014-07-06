@@ -7,11 +7,12 @@ package be.kdg.spacecrack.repositories;/* Git $Id
  */
 
 import be.kdg.spacecrack.model.Planet;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-public interface IPlanetRepository {
+@Repository
+public interface IPlanetRepository extends JpaRepository<Planet, Integer>{
+    @Query("select p from Planet p where p.name = ?1")
     Planet getPlanetByName(String planetName);
-
-    Planet[] getAll();
-
-    void createPlanets(Planet[] planets);
 }

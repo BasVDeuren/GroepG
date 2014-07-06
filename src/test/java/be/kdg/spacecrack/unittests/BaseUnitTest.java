@@ -6,9 +6,9 @@ package be.kdg.spacecrack.unittests;/* Git $Id$
  *
  */
 
+import be.kdg.spacecrack.repositories.IPlanetRepository;
 import be.kdg.spacecrack.repositories.MapFactory;
-import be.kdg.spacecrack.repositories.PlanetRepository;
-import org.hibernate.SessionFactory;
+import be.kdg.spacecrack.repositories.PlanetConnectionRepository;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"file:src/test/resources/application-context.xml"})
 @Transactional
 public abstract class BaseUnitTest {
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    SessionFactory sessionFactory;
 
+    @Autowired
+    protected IPlanetRepository planetRepository;
+    @Autowired
+    private PlanetConnectionRepository planetConnectionRepository;
     @Before
     public void createMap()
     {
-        MapFactory mapFactory = new MapFactory(sessionFactory,new PlanetRepository(sessionFactory));
+        MapFactory mapFactory = new MapFactory(planetRepository, planetConnectionRepository );
         mapFactory.createPlanets();
     }
 }

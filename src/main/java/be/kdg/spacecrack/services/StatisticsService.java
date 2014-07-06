@@ -35,7 +35,7 @@ public class StatisticsService implements IStatisticsService {
 
     @Override
     public StatisticsViewModel getStatistics(int profileId) {
-        Profile profile = profileRepository.getProfileByProfileId(profileId);
+        Profile profile = profileRepository.findOne(profileId);
         List<Game> games = gameRepository.getGamesByProfile(profile);
         int amountOfGames = 0;
         int amountOfWonGames = 0;
@@ -46,8 +46,12 @@ public class StatisticsService implements IStatisticsService {
             amountOfGames += 1;
             Player playerInGame = null;
             for (Player player : game.getPlayers()) {
-                if (profile.getPlayers().contains(player)) {
-                    playerInGame = player;
+                for(Player profilePlayer : profile.getPlayers())
+                {
+                    if(player.getPlayerId() == profilePlayer.getPlayerId())
+                    {
+                        playerInGame = player;
+                    }
                 }
             }
             if (game.getLoserPlayerId() != playerInGame.getPlayerId() && game.getLoserPlayerId() != 0) {

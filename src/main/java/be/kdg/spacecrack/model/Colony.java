@@ -21,7 +21,7 @@ import javax.persistence.Table;
 public class Colony extends Piece {
     @Id
     @GeneratedValue
-    private int colonyId;
+    private int id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "playerId")
@@ -49,12 +49,12 @@ public class Colony extends Piece {
 
 
 
-    public int getColonyId() {
-        return colonyId;
+    public int getId() {
+        return id;
     }
 
-    public void setColonyId(int colonyId) {
-        this.colonyId = colonyId;
+    public void setId(int colonyId) {
+        this.id = colonyId;
     }
 
     public Player getPlayer() {

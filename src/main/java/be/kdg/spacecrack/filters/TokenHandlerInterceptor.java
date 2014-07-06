@@ -31,8 +31,8 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
         HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper( httpServletResponse);
         HttpServletRequestWrapper requestWrapper = new HttpServletRequestWrapper(( httpServletRequest));
         //Checking if the request url should really pass through this interceptor,
-        // this is a small workaround for the integrationtests because,
-        // in the production environment this can't occur
+        //this is a small workaround for the integrationtests,
+        //in the production environment this can't occur
         if(!requestWrapper.getRequestURI().contains("/auth")){
             return true;
         }
@@ -56,6 +56,7 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
 
             AccessToken token = null;
             try {
+
                 token = authorizationService.getAccessTokenByValue(tokenValue);
             } catch (SpaceCrackUnauthorizedException ex) {
                 sendUnauthorized(responseWrapper);

@@ -3,14 +3,14 @@ package be.kdg.spacecrack.integrationtests;
 import be.kdg.spacecrack.controllers.TokenController;
 import be.kdg.spacecrack.model.AccessToken;
 import be.kdg.spacecrack.model.User;
-import be.kdg.spacecrack.repositories.TokenRepository;
-import be.kdg.spacecrack.repositories.UserRepository;
+import be.kdg.spacecrack.repositories.ITokenRepository;
+import be.kdg.spacecrack.repositories.IUserRepository;
 import be.kdg.spacecrack.services.AuthorizationService;
 import be.kdg.spacecrack.utilities.TokenStringGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -33,14 +33,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class IntegrationTokenFilterTests extends BaseFilteredIntegrationTests {
     MockHttpServletRequestBuilder requestBuilder;
     private User testUser;
+    @Autowired
+    private ITokenRepository tokenRepository;
+    @Autowired
+    private IUserRepository userRepository;
 
     @Before
     public void setUp() throws Exception {
         objectMapper = new ObjectMapper();
         requestBuilder = get("/auth/user");
-        Session session = sessionFactory.getCurrentSession();
+
         testUser = new User("testUsername", "testPassword", "testEmail", true);
-        session.saveOrUpdate(testUser);
+        userRepository.save(testUser);
     }
 
     @Test
@@ -65,8 +69,7 @@ public class IntegrationTokenFilterTests extends BaseFilteredIntegrationTests {
     @Test
     public void TokenFilter_validToken_OK() throws Exception {
         TokenStringGenerator generator = new TokenStringGenerator(12345);
-        TokenRepository tokenRepository = new TokenRepository(sessionFactory);
-        UserRepository userRepository = new UserRepository(sessionFactory);
+
         TokenController tokenController = new TokenController(new AuthorizationService(tokenRepository, userRepository, generator));
         AccessToken validToken = tokenController.login(testUser);
         mockMvc.perform(requestBuilder.cookie(new Cookie("accessToken", "%22" + validToken.getValue() + "%22"))).andExpect(status().isOk());

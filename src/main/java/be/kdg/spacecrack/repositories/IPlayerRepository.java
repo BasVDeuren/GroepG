@@ -7,9 +7,9 @@ package be.kdg.spacecrack.repositories;/* Git $Id
  */
 
 import be.kdg.spacecrack.model.Player;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface IPlayerRepository {
-
-
-    Player getPlayerByPlayerId(int playerId);
+@Repository
+public interface IPlayerRepository extends JpaRepository<Player, Integer>{
 }

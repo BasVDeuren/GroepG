@@ -8,7 +8,7 @@
     <name>SpaceCrack</name>
 
     <properties>
-        <spring.version>4.0.1.RELEASE</spring.version>
+        <spring.version>4.0.5.RELEASE</spring.version>
         <hibernate.version>4.1.9.Final</hibernate.version>
         <slf4j.version>1.7.6</slf4j.version>
     </properties>
@@ -24,21 +24,13 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-envers</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -73,12 +65,12 @@
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <!--<dependency>-->
             <!--<groupId>javax.persistence</groupId>-->
             <!--<artifactId>persistence-api</artifactId>-->
             <!--<version>1.0</version>-->
         <!--</dependency>-->
+
 
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
@@ -195,6 +187,23 @@
             <artifactId>httpclient</artifactId>
             <version>4.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>1.4.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.springtestdbunit</groupId>
+            <artifactId>spring-test-dbunit</artifactId>
+            <version>1.1.0</version>
+
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

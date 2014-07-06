@@ -31,7 +31,7 @@ public class MailTests {
         sender.setProfile(new Profile("Alice", "In wonderland", null, null));
 
        String expectedMessage = "Hello there, your friend Alice In wonderland invites you for a game of spacecrack, would you like to register?\n" +
-               "This can be done at our website: http://localhost:8080/#/";
+               "This can be done at our website: http://localhost:8081/#/";
 
         ArgumentCaptor<SimpleMailMessage> simpleMailMessageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
 

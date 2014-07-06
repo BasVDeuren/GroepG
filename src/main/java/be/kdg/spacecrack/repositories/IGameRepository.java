@@ -8,28 +8,19 @@ package be.kdg.spacecrack.repositories;/* Git $Id
 
 import be.kdg.spacecrack.model.Game;
 import be.kdg.spacecrack.model.Profile;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface IGameRepository {
+@Repository
+public interface IGameRepository extends JpaRepository<Game, Integer> {
 
-    int createOrUpdateGame(Game game);
-
-    int updateGame(Game game);
-
+    @Query("select game FROM Game game WHERE game.id in (SELECT player.game.id FROM Player player where player.profile = ?1)")
     List<Game> getGamesByProfile(Profile profile);
 
-    Game getGameByGameId(int gameId);
-
-    boolean updateGameOptimisticConcurrent(Game game, Integer actionNumber);
-
-    void deleteGame(int gameId);
-
-    Game getGameRevision(Number number, int gameId);
-
-    List<Integer> getRevisionNumbers(int gameId);
-
-    Game getGameForUpdate(Game game);
-
+    @Query("select g from Game g where g.id = ?1 and g.actionNumber = ?2")
+    Game getGameOptimisticConcurrent(Integer id, Integer actionNumber);
 
 }

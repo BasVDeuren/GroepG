@@ -14,7 +14,6 @@ import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.GameSynchronizer;
 import be.kdg.spacecrack.services.IGameSynchronizer;
-import be.kdg.spacecrack.services.handlers.MoveShipHandler;
 import be.kdg.spacecrack.utilities.IFirebaseUtil;
 import be.kdg.spacecrack.utilities.ViewModelConverter;
 import be.kdg.spacecrack.viewmodels.GameViewModel;
@@ -73,7 +72,7 @@ public class ReplayTests {
         IFirebaseUtil mockedFirebaseUtil = mock(IFirebaseUtil.class);
 
         IGameSynchronizer gameSynchronizer = new GameSynchronizer(new ViewModelConverter(), mockedFirebaseUtil, gameRepository);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, planetRepository, gameSynchronizer, shipRepository), new ViewModelConverter(), gameSynchronizer, gameRevisionRepository);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), gameSynchronizer, gameRevisionRepository);
     }
 
 

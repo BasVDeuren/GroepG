@@ -7,8 +7,6 @@ import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.GameSynchronizer;
 import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.services.IGameSynchronizer;
-import be.kdg.spacecrack.services.handlers.IMoveShipHandler;
-import be.kdg.spacecrack.services.handlers.MoveShipHandler;
 import be.kdg.spacecrack.utilities.ViewModelConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
@@ -63,7 +61,7 @@ public class GameServiceTests extends BaseUnitTest {
     @Before
     public void setUp() throws Exception {
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, planetRepository, mockGameSynchronizer, shipRepository), new ViewModelConverter(), mockGameSynchronizer, null);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
         user = new User();
         Profile profile = new Profile();
         opponentProfile = new Profile();
@@ -173,7 +171,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
 
-        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, planetRepository, mockGameSynchronizer, shipRepository), new ViewModelConverter(), mockGameSynchronizer, null);
+        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
 
         List<Game> actual = gameService1.getGames(user);
 
@@ -190,7 +188,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
 
-        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, planetRepository, mockGameSynchronizer, shipRepository), new ViewModelConverter(), mockGameSynchronizer, null);
+        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
         stub(gameRepository.findOne(expected.getId())).toReturn(expected);
 
         Game actual = gameService1.getGameByGameId(expected.getId());
@@ -337,20 +335,21 @@ public class GameServiceTests extends BaseUnitTest {
         //region Arrange
         Game game = createGame();
         Player player2 = game.getPlayers().get(1);
-        player2.setColonies(new ArrayList<Colony>());
+        player2.setColonies(new ArrayList<>());
         Ship ship = game.getPlayers().get(0).getShips().get(0);
 
         IShipRepository mockShipRepository = mock(IShipRepository.class);
         stub(mockShipRepository.findOne(ship.getShipId())).toReturn(ship);
-        IMoveShipHandler mockMoveShipHandler = mock(IMoveShipHandler.class);
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
-        GameService gameServiceWithMockedMoveShipHandler = new GameService(mockPlanetRepository, null, mockShipRepository, null, mockGameRepository, mockMoveShipHandler, new ViewModelConverter(), mockGameSynchronizer, null);
+
+        GameService gameServiceWithMockedMoveShipHandler = new GameService(planetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
         //endregion
         //region Act
-        gameServiceWithMockedMoveShipHandler.moveShip(ship.getShipId(), "a3");
+        gameServiceWithMockedMoveShipHandler.moveShip(ship.getShipId(), "b");
+        //endregion
         ArgumentCaptor<Game> gameArgumentCaptor = ArgumentCaptor.forClass(Game.class);
         verify(mockGameSynchronizer, VerificationModeFactory.times(1)).updateGame(gameArgumentCaptor.capture());
         Game gameResultGame = gameArgumentCaptor.getValue();
@@ -367,11 +366,10 @@ public class GameServiceTests extends BaseUnitTest {
 
         IShipRepository mockShipRepository = mock(IShipRepository.class);
         stub(mockShipRepository.findOne(ship.getShipId())).toReturn(ship);
-        IMoveShipHandler mockMoveShipHandler = mock(IMoveShipHandler.class);
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
-        GameService gameServiceWithMockedMoveShipHandler = new GameService(mockPlanetRepository, null, mockShipRepository, null, mockGameRepository, mockMoveShipHandler, new ViewModelConverter(), mock(GameSynchronizer.class), null);
+        GameService gameServiceWithMockedMoveShipHandler = new GameService(mockPlanetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mock(GameSynchronizer.class), null);
         gameServiceWithMockedMoveShipHandler.moveShip(ship.getShipId(), "b3");
     }
 
@@ -397,7 +395,7 @@ public class GameServiceTests extends BaseUnitTest {
         Colony newColony = new Colony(game.getGame_PlanetByPlanet(conqueredPlanet));
         expectedPerimeter.add(conqueredPlanet);
 
-        List<Perimeter> perimeters = gameService.moveShipHandler.detectPerimeter(player, newColony);
+        List<Perimeter> perimeters = game.detectPerimeter(player, newColony);
 
         // perimeters should only include 1 perimeter [hence get(0)]
         assertEquals("Only one planet should be surrounded by this perimeter.", perimeters.get(0).getInsidePlanets().size(), 1);
@@ -437,7 +435,7 @@ public class GameServiceTests extends BaseUnitTest {
         Planet conqueredPlanet = planetRepository.getPlanetByName(conqueredPlanetName);
         expectedPerimeter.add(conqueredPlanet);
 
-        List<Perimeter> perimeters = gameService.moveShipHandler.detectPerimeter(player, newColony);
+        List<Perimeter> perimeters = game.detectPerimeter(player, newColony);
 
         // perimeters should only include 1 perimeter [hence get(0)]
         assertEquals("Only one planet should be surrounded by this perimeter.", perimeters.get(0).getInsidePlanets().size(), 1);
@@ -467,7 +465,7 @@ public class GameServiceTests extends BaseUnitTest {
         Colony newColony = new Colony(game.getGame_PlanetByPlanet(conqueredPlanet));
         expectedPerimeter.add(conqueredPlanet);
 
-        List<Perimeter> perimeters = gameService.moveShipHandler.detectPerimeter(player, newColony);
+        List<Perimeter> perimeters = game.detectPerimeter(player, newColony);
 
         List<Planet> surroundedPlanets = new ArrayList<Planet>();
         for (String name : surroundedPlanetNames) {
@@ -517,7 +515,7 @@ public class GameServiceTests extends BaseUnitTest {
         expectedPerimeters.add(firstExpectedPerimeter);
         expectedPerimeters.add(secondExpectedPerimeter);
 
-        List<Perimeter> perimeters = gameService.moveShipHandler.detectPerimeter(player, newColony);
+        List<Perimeter> perimeters = game.detectPerimeter(player, newColony);
 
         assertTrue("Two perimeters should exist.", !perimeters.isEmpty());
         assertEquals("Two perimeters should exist.", perimeters.size(), 2);

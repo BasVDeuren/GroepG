@@ -9,6 +9,7 @@ package be.kdg.spacecrack.unittests;/* Git $Id
 import be.kdg.spacecrack.model.Game;
 import be.kdg.spacecrack.model.Player;
 import be.kdg.spacecrack.model.Profile;
+import be.kdg.spacecrack.model.gameturnstate.GameTurnState;
 import be.kdg.spacecrack.repositories.IGameRepository;
 import be.kdg.spacecrack.repositories.IPlayerRepository;
 import be.kdg.spacecrack.repositories.IProfileRepository;
@@ -60,6 +61,7 @@ public class GameRepositoryTests extends BaseUnitTest {
         Player player1 = new Player(profile1);
         Player player2 = new Player(profile2);
         expected = new Game();
+        expected.setGameTurnState(GameTurnState.NOTURNSENDED);
         player1.setGame(expected);
         player2.setGame(expected);
         expected.getPlayers().add(player1);

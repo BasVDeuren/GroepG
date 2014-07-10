@@ -9,7 +9,6 @@ package be.kdg.spacecrack.unittests;/* Git $Id
 import be.kdg.spacecrack.model.*;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.*;
-import be.kdg.spacecrack.services.handlers.MoveShipHandler;
 import be.kdg.spacecrack.utilities.ViewModelConverter;
 import be.kdg.spacecrack.viewmodels.StatisticsViewModel;
 import org.junit.Before;
@@ -44,12 +43,8 @@ public class StatisticsServiceTests extends BaseUnitTest {
 
     @Before
     public void setUp() throws Exception {
-
-
-
-
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new MoveShipHandler(colonyRepository, planetRepository, mockGameSynchronizer, shipRepository), new ViewModelConverter(), mockGameSynchronizer, null);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
 
         mockGameRepository = mock(IGameRepository.class);
         mockProfileRepository = mock(IProfileRepository.class);

@@ -7,10 +7,6 @@ package be.kdg.spacecrack.controllers;/* Git $Id
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
-import be.kdg.spacecrack.commands.Action;
-import be.kdg.spacecrack.commands.BuildShipAction;
-import be.kdg.spacecrack.commands.EndTurnAction;
-import be.kdg.spacecrack.commands.MoveShipAction;
 import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.utilities.IFirebaseUtil;
 import be.kdg.spacecrack.utilities.IViewModelConverter;
@@ -62,17 +58,16 @@ public class ActionController{
         }
 
         String actionType = actionViewModel.getActionType();
-        Action action;
         if (actionType.equals(MOVESHIP)) {
-            action = new MoveShipAction(gameService, actionViewModel.getPlayerId(), actionViewModel.getShip(), actionViewModel.getDestinationPlanetName());
+            gameService.moveShip(actionViewModel.getShip().getShipId(), actionViewModel.getDestinationPlanetName());
         } else if (actionType.equals(ENDTURN)) {
-            action = new EndTurnAction(gameService, actionViewModel.getPlayerId());
+            gameService.endTurn(actionViewModel.getPlayerId());
         } else if (actionType.equals(BUILDSHIP)) {
-            action = new BuildShipAction(gameService, actionViewModel.getPlayerId(), actionViewModel.getColony());
+           gameService.buildShip( actionViewModel.getColony().getColonyId());
         } else {
             throw new SpaceCrackNotAcceptableException("Unsupported action type");
         }
-        action.execute();
+
 
     }
 

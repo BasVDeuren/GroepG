@@ -13,6 +13,8 @@
        http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/data/jpa
     http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    <context:spring-configured/>
+    <context:load-time-weaver aspectj-weaving="autodetect"/>
     <rep:repositories base-package="be.kdg.spacecrack.repositories" />
     <tx:annotation-driven/>
     <context:component-scan base-package="be.kdg.spacecrack.validators"/>
@@ -22,6 +24,7 @@
             base-package="be.kdg.spacecrack.services"/>
     <context:component-scan
             base-package="be.kdg.spacecrack.utilities"/>
+    <context:component-scan base-package="be.kdg.spacecrack.model"/>
     <context:component-scan base-package="be.kdg.spacecrack.Exceptions"/>
 
 

@@ -17,10 +17,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration( locations = {"file:src/test/resources/application-context.xml"})
+@ContextConfiguration(locations = {"file:src/test/resources/application-context.xml"})
 @Transactional
 public abstract class BaseUnitTest {
-
     @Autowired
     protected IPlanetRepository planetRepository;
     @Autowired

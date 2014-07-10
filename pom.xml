@@ -7,11 +7,29 @@
     <version>1.0-SNAPSHOT</version>
     <name>SpaceCrack</name>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+
+        <repository>
+            <id>opencast-public</id>
+            <url>http://repository.opencastproject.org/nexus/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>springframework-releases</id>
+            <url>http://maven.springframework.org/release/</url>
+        </repository>
+    </repositories>
+
     <properties>
         <spring.version>4.0.5.RELEASE</spring.version>
         <hibernate.version>4.1.9.Final</hibernate.version>
         <slf4j.version>1.7.6</slf4j.version>
+        <aspectj.version>1.8.1</aspectj.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -19,11 +37,7 @@
             <version>${slf4j.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -47,7 +61,7 @@
             <artifactId>spring-core</artifactId>
             <version>${spring.version}</version>
         </dependency>
-    
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -66,9 +80,9 @@
             <version>${spring.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>javax.persistence</groupId>-->
-            <!--<artifactId>persistence-api</artifactId>-->
-            <!--<version>1.0</version>-->
+        <!--<groupId>javax.persistence</groupId>-->
+        <!--<artifactId>persistence-api</artifactId>-->
+        <!--<version>1.0</version>-->
         <!--</dependency>-->
 
 
@@ -85,9 +99,9 @@
             <version>${spring.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter</artifactId>-->
-            <!--<version>1.0.0.RC1</version>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter</artifactId>-->
+        <!--<version>1.0.0.RC1</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -197,11 +211,36 @@
             <artifactId>spring-data-jpa</artifactId>
             <version>1.4.3.RELEASE</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework</groupId>-->
+            <!--<artifactId>spring-aspects</artifactId>-->
+            <!--<version>${spring.version}</version>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>com.github.springtestdbunit</groupId>
-            <artifactId>spring-test-dbunit</artifactId>
-            <version>1.1.0</version>
-
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-agent</artifactId>
+            <version>2.5.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.peichhorn</groupId>
+            <artifactId>lombok-pg</artifactId>
+            <version>0.11.3</version>
         </dependency>
 
     </dependencies>
@@ -219,12 +258,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
         <finalName>SpaceCrack</finalName>
-
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -235,11 +274,46 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.6</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+
+
+                </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outxml>true</outxml>
+                    <XterminateAfterCompilation>true</XterminateAfterCompilation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.16</version>
                 <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>
+                        -javaagent:${user.home}\.m2\repository\org\springframework\spring-instrument\${spring.version}\spring-instrument-${spring.version}.jar
+                    </argLine>
+                    <argLine>-javaagent:${user.home}\.m2\repository\org\springframework\spring-agent\2.5.6\spring-agent-2.5.6.jar</argLine>
+                    <useSystemClassLoader>true</useSystemClassLoader>
                     <includes>
-                        <include>** /*Tests.java</include>
+                        <include>be.kdg.spacecrack.unittests.*</include>
+                        <include>be.kdg.spacecrack.integrationtests.*</include>
+                        <include>be.kdg.spacecrack.seleniumtests.*</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -256,7 +330,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.16</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

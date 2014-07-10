@@ -6,6 +6,7 @@ package be.kdg.spacecrack.model;/* Git $Id$
  *
  */
 
+import lombok.NonNull;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -63,7 +64,7 @@ public class Game_Planet {
         return game;
     }
 
-    public void setGame(Game game) {
+    public void setGame(@NonNull Game game) {
         game.internalAddGame_Planet(this);
         this.game = game;
     }
@@ -72,7 +73,7 @@ public class Game_Planet {
         return ship;
     }
 
-    public void setShip(Ship ship) {
+    public void setShip(@NonNull Ship ship) {
         ship.internalSetGame_Planet(this);
         this.ship = ship;
     }
@@ -81,7 +82,7 @@ public class Game_Planet {
         return colony;
     }
 
-    public void setColony(Colony colony) {
+    public void setColony(@NonNull Colony colony) {
         colony.internalSetGame_Planet(this);
         this.colony = colony;
     }
@@ -99,10 +100,12 @@ public class Game_Planet {
     }
 
     public void removeShip() {
+        ship.internalSetGame_Planet(null);
         internalSetShip(null);
     }
 
     public void removeColony() {
+        colony.internalSetGame_Planet(null);
         internalSetColony(null);
     }
 }

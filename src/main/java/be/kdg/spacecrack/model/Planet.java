@@ -131,4 +131,21 @@ public class Planet {
         }
         return null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Planet)) return false;
+
+        Planet planet = (Planet) o;
+
+        if (!name.equals(planet.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

@@ -3,8 +3,8 @@ package be.kdg.spacecrack.services;
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
 import be.kdg.spacecrack.Exceptions.SpaceCrackUnexpectedException;
 import be.kdg.spacecrack.model.*;
+import be.kdg.spacecrack.model.gameturnstate.GameTurnState;
 import be.kdg.spacecrack.repositories.*;
-import be.kdg.spacecrack.services.handlers.IMoveShipHandler;
 import be.kdg.spacecrack.utilities.IViewModelConverter;
 import be.kdg.spacecrack.viewmodels.GameViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,6 @@ public class GameService implements IGameService {
     @Autowired
     private IGameRepository gameRepository;
 
-    @Autowired
-    public IMoveShipHandler moveShipHandler;
 
     @Autowired
     private IViewModelConverter viewModelConverter;
@@ -63,7 +61,6 @@ public class GameService implements IGameService {
                        IShipRepository shipRepository,
                        IPlayerRepository playerRepository,
                        IGameRepository gameRepository,
-                       IMoveShipHandler moveShipHandler,
                        IViewModelConverter viewModelConverter,
                        IGameSynchronizer gameSynchronizer,
                        GameRevisionRepository gameRevisionRepository) {
@@ -72,7 +69,6 @@ public class GameService implements IGameService {
         this.colonyRepository = colonyRepository;
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
-        this.moveShipHandler = moveShipHandler;
         this.viewModelConverter = viewModelConverter;
         this.gameSynchronizer = gameSynchronizer;
 
@@ -82,13 +78,13 @@ public class GameService implements IGameService {
     @Override
     public int createGame(Profile userProfile, String gameName, Profile opponentProfile) {
         Game game = new Game();
-
+        game.setGameTurnState(GameTurnState.NOTURNSENDED);
 
         List<Planet> planets = planetRepository.findAll();
 
         planets.forEach(planet -> {
-          Game_Planet game_planet = new Game_Planet(planet);
-          game.addGame_Planet(game_planet);
+            Game_Planet game_planet = new Game_Planet(planet);
+            game.addGame_Planet(game_planet);
         });
 
         Player player1 = new Player();
@@ -147,8 +143,10 @@ public class GameService implements IGameService {
         Game game = ship.getPlayer().getGame();
         Planet destinationPlanet = planetRepository.getPlanetByName(planetName);
         validateActionMakeSureGameIsNotFinishedYet(game);
-        moveShipHandler.validateMove(ship, destinationPlanet);
-        moveShipHandler.moveShip(ship, destinationPlanet);
+        ship.validateMove(destinationPlanet);
+
+        ship.move(destinationPlanet);
+
         checkLost(game);
         game.incrementActionNumber();
         gameSynchronizer.updateGame(game);
@@ -170,40 +168,10 @@ public class GameService implements IGameService {
     @Override
     public void endTurn(Integer playerID) {
         Player player = playerRepository.findOne(playerID);
-
-        Game game = gameRepository.findOne(player.getGame().getId());
+        Game game = player.getGame();
         Integer oldActionNumber = game.getActionNumber();
-
-
-        if (!player.isTurnEnded()) {
-
-            player.setTurnEnded(true);
-            boolean allTurnsEnded = true;
-            List<Player> players = game.getPlayers();
-
-            for (Player p : players) {
-                if (!p.isTurnEnded()) {
-                    allTurnsEnded = false;
-                }
-            }
-            if (allTurnsEnded) {
-                for (Player p : players) {
-                    startNewTurn(p);
-
-                }
-            }
-        } else {
-            throw new SpaceCrackNotAcceptableException("Turn is already ended");
-        }
-
+        player.endTurn();
         gameSynchronizer.updateGameConcurrent(game, oldActionNumber);
-    }
-
-    private void startNewTurn(Player p) {
-        int commandPoints = p.getCommandPoints();
-        p.setCommandPoints(commandPoints + COMMANDPOINTS_PER_TURN);
-        p.getColonies().forEach(colony ->  p.addCrack(IGameService.CRACK_PER_COLONY));
-        p.setTurnEnded(false);
     }
 
     @Override
@@ -229,7 +197,7 @@ public class GameService implements IGameService {
 
         Stream<Player> gamePlayersStream = game.getPlayers().stream();
         Optional<Player> shipOptional = gamePlayersStream.filter(p -> user.getProfile().getPlayers().contains(p)).findFirst();
-        if(!shipOptional.isPresent()){
+        if (!shipOptional.isPresent()) {
             throw new SpaceCrackUnexpectedException("This user isn't playing this game");
         }
         return shipOptional.get();
@@ -248,7 +216,7 @@ public class GameService implements IGameService {
             throw new SpaceCrackNotAcceptableException("Insufficient commandpoints.");
         } else if (player.isTurnEnded()) {
             throw new SpaceCrackNotAcceptableException("Your turn has ended.");
-        }else if(player.getCrack() < BUILDSHIP_CRACK_COST){
+        } else if (player.getCrack() < BUILDSHIP_CRACK_COST) {
             throw new SpaceCrackNotAcceptableException("Insufficient crack.");
         }
 
@@ -268,7 +236,7 @@ public class GameService implements IGameService {
         }
 
         player.setCommandPoints(player.getCommandPoints() - BUILDSHIP_COST);
-        player.setCrack(player.getCrack()-BUILDSHIP_CRACK_COST);
+        player.setCrack(player.getCrack() - BUILDSHIP_CRACK_COST);
         game.incrementActionNumber();
         gameSynchronizer.updateGame(game);
     }

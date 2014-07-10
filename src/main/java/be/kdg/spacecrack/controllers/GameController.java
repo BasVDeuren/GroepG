@@ -106,7 +106,7 @@ public class GameController {
     public List<GameViewModel> getGamesByAccessToken(@CookieValue("accessToken") String accessTokenValue) {
         User user = authorizationService.getUserByAccessTokenValue(accessTokenValue);
         List<Game> games = gameService.getGames(user);
-        List<GameViewModel> gameViewModels = new ArrayList<GameViewModel>();
+        List<GameViewModel> gameViewModels = new ArrayList<>();
         for (Game g : games) {
             GameViewModel gameViewModel;
             gameViewModel = viewModelConverter.convertGameToViewModel(g);

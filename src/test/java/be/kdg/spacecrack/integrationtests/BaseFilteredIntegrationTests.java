@@ -7,8 +7,7 @@ import be.kdg.spacecrack.model.Profile;
 import be.kdg.spacecrack.model.User;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.*;
-import be.kdg.spacecrack.services.handlers.IMoveShipHandler;
-import be.kdg.spacecrack.services.handlers.MoveShipHandler;
+
 import be.kdg.spacecrack.utilities.IFirebaseUtil;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
 import be.kdg.spacecrack.utilities.TokenStringGenerator;
@@ -91,6 +90,7 @@ public abstract class BaseFilteredIntegrationTests {
     protected PlanetConnectionRepository planetConnectionRepository;
     @Autowired
     protected GameRevisionRepository gameRevisionRepository;
+
     @Before
     public void setupMockMVC() throws Exception {
         ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
@@ -102,10 +102,10 @@ public abstract class BaseFilteredIntegrationTests {
             ViewModelConverter viewModelConverter = new ViewModelConverter();
             IFirebaseUtil firebaseUtil = mock(IFirebaseUtil.class);
             GameSynchronizer gameSynchronizer = new GameSynchronizer(viewModelConverter, firebaseUtil, gameRepository);
-            IMoveShipHandler moveShipHandler = new MoveShipHandler(colonyRepository, planetRepository, gameSynchronizer, shipRepository);
+
 
             GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
-            IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, moveShipHandler, viewModelConverter, mockGameSynchronizer, gameRevisionRepository);
+            IGameService gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, viewModelConverter, mockGameSynchronizer, gameRevisionRepository);
             IAuthorizationService authorizationService = new AuthorizationService(tokenRepository, userRepository, tokenStringGenerator);
 
             mockMailSender = mock(JavaMailSender.class);

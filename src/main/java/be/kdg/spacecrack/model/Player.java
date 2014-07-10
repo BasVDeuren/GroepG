@@ -1,12 +1,13 @@
 package be.kdg.spacecrack.model;
 
-import org.hibernate.annotations.*;
+import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
+import be.kdg.spacecrack.services.GameService;
+import be.kdg.spacecrack.services.IGameService;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -180,5 +181,82 @@ public class Player {
     public void addCrack(int crack) {
         this.crack += crack;
 
+    }
+
+    protected void colonizePlanet(Game_Planet game_planet) {
+        final Colony colony = new Colony(game_planet, this, IGameService.NEW_COLONY_STRENGHT);
+        colonizePerimeteredPlanets(colony);
+    }
+
+
+    private void colonizePerimeteredPlanets( Colony colony) {
+        List<Perimeter> perimeters = game.detectPerimeter(this, colony);
+
+        List<Colony> coloniesByGame = game.getColonies();
+        List<Ship> shipsByGame = game.getShips();
+
+        for (Perimeter perimeter : perimeters) {
+            List<Planet> insidePlanets = perimeter.getInsidePlanets();
+
+            insidePlanets.forEach(insidePlanet -> {
+                //If there is an existing colony on the insidePlanet delete it
+                coloniesByGame.stream()
+                        .filter(c -> c.isOnPlanet(insidePlanet))
+                        .forEach(Colony::kill);
+                //If there is a ship the enemy player on the insidePlanet delete it
+                shipsByGame.stream()
+                        .filter(s -> s.isOnPlanet( insidePlanet) && s.getPlayer().getPlayerId() != playerId)
+                        .forEach(Ship::kill);
+                //Create new Colonies on the insidePlanets.
+                Colony newColony = new Colony();
+                newColony.setGame_planet(game.getGame_PlanetByPlanet(insidePlanet));
+                newColony.setStrength(GameService.NEW_COLONY_STRENGHT);
+                addColony(newColony);
+            });
+        }
+    }
+
+
+    public void endTurn() {
+        if (!isTurnEnded()) {
+
+            setTurnEnded(true);
+            game.notifyTurnEnded(this);
+        } else {
+            throw new SpaceCrackNotAcceptableException("Turn is already ended");
+        }
+
+
+    }
+
+
+
+    public void startNewTurn() {
+
+        int commandPoints = getCommandPoints();
+        setCommandPoints(commandPoints + IGameService.COMMANDPOINTS_PER_TURN);
+        getColonies().forEach(colony ->  addCrack(IGameService.CRACK_PER_COLONY));
+        setTurnEnded(false);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Player)) return false;
+
+        Player player = (Player) o;
+
+        if (!game.equals(player.game)) return false;
+        if (!profile.equals(player.profile)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = profile.hashCode();
+        result = 31 * result + game.hashCode();
+        return result;
     }
 }

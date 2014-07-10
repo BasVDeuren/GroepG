@@ -6,16 +6,20 @@ package be.kdg.spacecrack.model;/* Git $Id$
  *
  */
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
 @Audited
 @MappedSuperclass
 public abstract class Piece {
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_planetId")
+    protected Game_Planet game_planet;
     @Column
-    private int strength;
+    protected int strength;
 
     public int getStrength() {
         return strength;
@@ -23,5 +27,34 @@ public abstract class Piece {
 
     public void setStrength(int strength) {
         this.strength = strength;
+    }
+
+
+    public boolean isOnPlanet(Planet destinationPlanet) {
+        if(destinationPlanet.equals(game_planet.getPlanet()))        {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    protected abstract void kill() ;
+
+
+    protected Piece fightPiece( Piece enemyPiece) {
+        int strengthDifference = strength - enemyPiece.strength;
+        if (strengthDifference < 0) {
+            kill();
+            enemyPiece.strength =-strengthDifference;
+            return enemyPiece;
+        } else if (strengthDifference > 0) {
+            enemyPiece.kill();
+            strength = strengthDifference;
+            return this;
+        } else {
+            kill();
+            enemyPiece.kill();
+            return null;
+        }
     }
 }

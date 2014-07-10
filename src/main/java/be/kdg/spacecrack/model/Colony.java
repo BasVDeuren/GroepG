@@ -8,12 +8,9 @@ package be.kdg.spacecrack.model;/* Git $Id
 
 //import org.codehaus.jackson.annotate.JsonIgnore;
 
-import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
 @Audited
@@ -26,11 +23,6 @@ public class Colony extends Piece {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "playerId")
     private Player player;
-
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "game_planetId", nullable = false)
-    private Game_Planet game_planet;
 
     @Version
     private int versionNumber;
@@ -47,7 +39,10 @@ public class Colony extends Piece {
        setGame_planet(game_planet);
     }
 
-
+    protected void kill() {
+        game_planet.removeColony();
+        player.removeColony(this);
+    }
 
     public int getId() {
         return id;
@@ -87,4 +82,6 @@ public class Colony extends Piece {
     public void setPlanet(Planet planet) {
         setGame_planet(player.getGame().getGame_PlanetByPlanet(planet));
     }
+
+
 }

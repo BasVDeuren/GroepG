@@ -6,9 +6,9 @@ package be.kdg.spacecrack.services;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Player;
-import be.kdg.spacecrack.model.Profile;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Player;
+import be.kdg.spacecrack.model.authentication.Profile;
 import be.kdg.spacecrack.repositories.IGameRepository;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.viewmodels.StatisticsViewModel;
@@ -54,6 +54,7 @@ public class StatisticsService implements IStatisticsService {
                     }
                 }
             }
+            assert playerInGame != null;
             if (game.getLoserPlayerId() != playerInGame.getPlayerId() && game.getLoserPlayerId() != 0) {
                 amountOfWonGames += 1;
                 totalColoniesWhenWon += playerInGame.getColonies().size();

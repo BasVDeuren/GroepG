@@ -1,7 +1,7 @@
 package be.kdg.spacecrack.repositories;
 
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

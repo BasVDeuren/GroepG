@@ -6,7 +6,7 @@ package be.kdg.spacecrack.unittests;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

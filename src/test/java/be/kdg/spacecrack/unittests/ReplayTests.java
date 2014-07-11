@@ -6,10 +6,11 @@ package be.kdg.spacecrack.unittests;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.Ship;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.game.GameFactory;
+import be.kdg.spacecrack.model.game.Ship;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.GameSynchronizer;
@@ -63,6 +64,10 @@ public class ReplayTests {
     private IProfileRepository profileRepository;
     @Autowired
     private GameRevisionRepository gameRevisionRepository;
+    @Autowired
+    private IMapFactory mapFactory;
+    @Autowired
+    private GameFactory gameFactory;
 
     @Before
     public void setup() {
@@ -72,7 +77,7 @@ public class ReplayTests {
         IFirebaseUtil mockedFirebaseUtil = mock(IFirebaseUtil.class);
 
         IGameSynchronizer gameSynchronizer = new GameSynchronizer(new ViewModelConverter(), mockedFirebaseUtil, gameRepository);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), gameSynchronizer, gameRevisionRepository);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), gameSynchronizer, gameRevisionRepository, mapFactory, gameFactory);
     }
 
 

@@ -6,10 +6,10 @@ package be.kdg.spacecrack.utilities;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Colony;
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Player;
-import be.kdg.spacecrack.model.Ship;
+import be.kdg.spacecrack.model.game.Colony;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Player;
+import be.kdg.spacecrack.model.game.Ship;
 import be.kdg.spacecrack.viewmodels.ColonyViewModel;
 import be.kdg.spacecrack.viewmodels.GameViewModel;
 import be.kdg.spacecrack.viewmodels.PlayerViewModel;

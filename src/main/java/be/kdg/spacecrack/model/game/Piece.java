@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;/* Git $Id$
+package be.kdg.spacecrack.model.game;/* Git $Id$
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -31,11 +31,7 @@ public abstract class Piece {
 
 
     public boolean isOnPlanet(Planet destinationPlanet) {
-        if(destinationPlanet.equals(game_planet.getPlanet()))        {
-            return true;
-        }else {
-            return false;
-        }
+        return destinationPlanet.equals(game_planet.getPlanet());
     }
 
     protected abstract void kill() ;

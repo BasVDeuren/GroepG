@@ -1,7 +1,7 @@
 package be.kdg.spacecrack.integrationtests;
 
 import be.kdg.spacecrack.controllers.UserController;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import be.kdg.spacecrack.services.AuthorizationService;
 import be.kdg.spacecrack.services.UserService;

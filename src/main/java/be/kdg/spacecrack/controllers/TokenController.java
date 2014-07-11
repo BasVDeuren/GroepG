@@ -1,7 +1,7 @@
 package be.kdg.spacecrack.controllers;
 
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,9 +36,7 @@ public class TokenController{
 
     @RequestMapping(value="/accesstokens", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody AccessToken login(@RequestBody User user) {
-        AccessToken accessToken = tokenService.login(user);
-
-        return accessToken;
+        return tokenService.login(user);
     }
 
     @RequestMapping(value="/accesstokens", method = RequestMethod.DELETE)

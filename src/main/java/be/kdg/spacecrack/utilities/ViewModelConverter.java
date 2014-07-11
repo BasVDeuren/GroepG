@@ -6,10 +6,10 @@ package be.kdg.spacecrack.utilities;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Colony;
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Player;
-import be.kdg.spacecrack.model.Ship;
+import be.kdg.spacecrack.model.game.Colony;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Player;
+import be.kdg.spacecrack.model.game.Ship;
 import be.kdg.spacecrack.viewmodels.ColonyViewModel;
 import be.kdg.spacecrack.viewmodels.GameViewModel;
 import be.kdg.spacecrack.viewmodels.PlayerViewModel;
@@ -50,18 +50,18 @@ public class ViewModelConverter implements IViewModelConverter {
        PlayerViewModel playerViewModel = new PlayerViewModel();
        playerViewModel.setCommandPoints(player.getCommandPoints());
        playerViewModel.setTurnEnded(player.isTurnEnded());
-       playerViewModel.setRequestAccepted(player.isRequestAccepted());
+       playerViewModel.setRequestAccepted(player.isReadyToPlay());
        playerViewModel.setProfileId(player.getProfile().getProfileId());
        playerViewModel.setPlayerName((player.getProfile().getFirstname() + " " + player.getProfile().getLastname()).replaceAll("\\s","_"));
        playerViewModel.setPlayerId(player.getPlayerId());
         playerViewModel.setCrack(player.getCrack());
-       List<ShipViewModel> shipViewModels  = new ArrayList<ShipViewModel>();
+       List<ShipViewModel> shipViewModels  = new ArrayList<>();
        for(Ship ship: player.getShips()) {
            ShipViewModel shipViewModel = convertShipToViewModel(ship);
            shipViewModels.add(shipViewModel);
        }
        playerViewModel.setShips(shipViewModels);
-       List<ColonyViewModel> colonyViewModels = new ArrayList<ColonyViewModel>();
+       List<ColonyViewModel> colonyViewModels = new ArrayList<>();
        for(Colony colony: player.getColonies()) {
            ColonyViewModel colonyViewModel = convertColonyToViewModel(colony);
            colonyViewModels.add(colonyViewModel);
@@ -75,15 +75,15 @@ public class ViewModelConverter implements IViewModelConverter {
         PlayerViewModel playerViewModel = new PlayerViewModel();
         playerViewModel.setCommandPoints(player.getCommandPoints());
         playerViewModel.setTurnEnded(player.isTurnEnded());
-        playerViewModel.setRequestAccepted(player.isRequestAccepted());
+        playerViewModel.setRequestAccepted(player.isReadyToPlay());
         playerViewModel.setPlayerId(player.getPlayerId());
-        List<ShipViewModel> shipViewModels  = new ArrayList<ShipViewModel>();
+        List<ShipViewModel> shipViewModels  = new ArrayList<>();
         for(Ship ship: player.getShips()) {
             ShipViewModel shipViewModel = convertShipToViewModel(ship);
             shipViewModels.add(shipViewModel);
         }
         playerViewModel.setShips(shipViewModels);
-        List<ColonyViewModel> colonyViewModels = new ArrayList<ColonyViewModel>();
+        List<ColonyViewModel> colonyViewModels = new ArrayList<>();
         for(Colony colony: player.getColonies()) {
             ColonyViewModel colonyViewModel = convertColonyToViewModel(colony);
             colonyViewModels.add(colonyViewModel);

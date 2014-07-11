@@ -6,8 +6,8 @@ package be.kdg.spacecrack.controllers;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IProfileService;
 import be.kdg.spacecrack.services.IUserService;

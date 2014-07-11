@@ -1,8 +1,8 @@
 package be.kdg.spacecrack.services;
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackAlreadyExistsException;
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -8,20 +8,19 @@ package be.kdg.spacecrack.repositories;/* Git $Id$
  */
 
 import be.kdg.spacecrack.controllers.MapController;
-import be.kdg.spacecrack.model.Planet;
-import be.kdg.spacecrack.model.PlanetConnection;
-import be.kdg.spacecrack.model.SpaceCrackMap;
+import be.kdg.spacecrack.model.game.Planet;
+import be.kdg.spacecrack.model.game.PlanetConnection;
+import be.kdg.spacecrack.model.game.SpaceCrackMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
-@Service("mapFactory")
+@Component("mapFactory")
 @Transactional
 public class MapFactory implements IMapFactory {
 
@@ -39,12 +38,8 @@ public class MapFactory implements IMapFactory {
     }
 
     private void connectPlanetsByRadius(Planet[] planets, double radius) {
-
-
-        for (int i = 0; i < planets.length; i++) {
-            Planet checkPlanet = planets[i];
-            for (int j = 0; j < planets.length; j++) {
-                Planet planet = planets[j];
+        for (Planet checkPlanet : planets) {
+            for (Planet planet : planets) {
                 // Point coords
                 int pX = planet.getX();
                 int pY = planet.getY();
@@ -58,7 +53,7 @@ public class MapFactory implements IMapFactory {
                         PlanetConnection planetConnection = new PlanetConnection(checkPlanet, planet);
                         planetConnectionRepository.save(planetConnection);
                         checkPlanet.addConnection(planetConnection);
-                       planetRepository.save(checkPlanet);
+                        planetRepository.save(checkPlanet);
                     }
                 }
             }
@@ -80,8 +75,8 @@ public class MapFactory implements IMapFactory {
 
     @Override
     public SpaceCrackMap getSpaceCrackMap() {
-        List<Planet> all = planetRepository.findAll();
-        Planet[] planets = all.toArray(new Planet[all.size()]);
+
+        List<Planet> planets = planetRepository.findAll();
         return new SpaceCrackMap(planets);
     }
 
@@ -192,8 +187,8 @@ public class MapFactory implements IMapFactory {
 
             // Add more space between planets
             for (Planet planet : planets) {
-                planet.setX((int) (planet.getX() * 2));
-                planet.setY((int) (planet.getY() * 2));
+                planet.setX( (planet.getX() * 2));
+                planet.setY( (planet.getY() * 2));
             }
 
 
@@ -228,16 +223,11 @@ public class MapFactory implements IMapFactory {
      * 7. Go to the next planet (back to step 1)
      */
     private void removeCrossingConnections(Planet[] planets) {
-        List<PlanetConnection> connectionsToRemove = new ArrayList<PlanetConnection>();
-        for (int i = 0; i < planets.length; i++) {
-            Planet currentPlanet = planets[i];
-            Iterator<PlanetConnection> currentPlanetIterator = currentPlanet.getPlanetConnections().iterator();
-            while (currentPlanetIterator.hasNext()) {
-                PlanetConnection connectionToTest = currentPlanetIterator.next();
+        List<PlanetConnection> connectionsToRemove = new ArrayList<>();
+        for (Planet currentPlanet : planets) {
+            for (PlanetConnection connectionToTest : currentPlanet.getPlanetConnections()) {
                 Line2D line1 = new Line2D.Float(connectionToTest.getParentPlanet().getX(), connectionToTest.getParentPlanet().getY(), connectionToTest.getChildPlanet().getX(), connectionToTest.getChildPlanet().getY());
-                Iterator<PlanetConnection> currentPlanetConnectionIterator = currentPlanet.getPlanetConnections().iterator();
-                while (currentPlanetConnectionIterator.hasNext()) {
-                    PlanetConnection currentPlanetConnection = currentPlanetConnectionIterator.next();
+                for (PlanetConnection currentPlanetConnection : currentPlanet.getPlanetConnections()) {
                     Planet neighbour;
                     if (currentPlanetConnection.getParentPlanet().getPlanetId() == currentPlanet.getPlanetId()) {
                         neighbour = currentPlanetConnection.getChildPlanet();
@@ -245,9 +235,7 @@ public class MapFactory implements IMapFactory {
                         neighbour = currentPlanetConnection.getParentPlanet();
                     }
 
-                    Iterator<PlanetConnection> neighbourConnectionIterator = neighbour.getPlanetConnections().iterator();
-                    while (neighbourConnectionIterator.hasNext()) {
-                        PlanetConnection neighbourConnectionToTest = neighbourConnectionIterator.next();
+                    for (PlanetConnection neighbourConnectionToTest : neighbour.getPlanetConnections()) {
                         Line2D line2 = new Line2D.Float(neighbourConnectionToTest.getParentPlanet().getX(), neighbourConnectionToTest.getParentPlanet().getY(), neighbourConnectionToTest.getChildPlanet().getX(), neighbourConnectionToTest.getChildPlanet().getY());
 
                         if (line1.intersectsLine(line2) && !line1.getP1().equals(line2.getP1()) && !line1.getP1().equals(line2.getP2()) && !line1.getP2().equals(line2.getP1()) && !line1.getP2().equals(line2.getP2())) {

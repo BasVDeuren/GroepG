@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;/* Git $Id
+package be.kdg.spacecrack.model.game;/* Git $Id
  *
  * Project Application Development
  * Karel de Grote-Hogeschool

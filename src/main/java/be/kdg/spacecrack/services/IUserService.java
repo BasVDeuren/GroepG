@@ -6,15 +6,13 @@ package be.kdg.spacecrack.services;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.User;
 
 import java.util.List;
 
 public interface IUserService {
     public User getUserByAccessToken(AccessToken accessToken) throws Exception;
-
-    User getUserByUsername(String username) throws Exception;
 
     void registerUser(String username, String password, String email) throws Exception;
 

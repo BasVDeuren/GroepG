@@ -1,6 +1,6 @@
 package be.kdg.spacecrack.repositories;
 
-import be.kdg.spacecrack.model.AccessToken;
+import be.kdg.spacecrack.model.authentication.AccessToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,9 +14,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ITokenRepository extends JpaRepository<AccessToken, Integer> {
-
     @Query("Select accessToken from AccessToken accessToken where accessToken.value = ?1")
     AccessToken getAccessTokenByValue(String value);
-
-;
 }

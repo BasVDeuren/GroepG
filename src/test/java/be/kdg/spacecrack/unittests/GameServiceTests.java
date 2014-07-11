@@ -1,12 +1,15 @@
 package be.kdg.spacecrack.unittests;
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
-import be.kdg.spacecrack.model.*;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
+import be.kdg.spacecrack.model.game.*;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.GameSynchronizer;
 import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.services.IGameSynchronizer;
+import be.kdg.spacecrack.utilities.IFirebaseUtil;
 import be.kdg.spacecrack.utilities.ViewModelConverter;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Before;
@@ -52,6 +55,10 @@ public class GameServiceTests extends BaseUnitTest {
     private EntityManagerFactory entityManagerFactory;
     @Autowired
     private IProfileRepository profileRepository;
+    @Autowired
+    private IMapFactory mapFactory;
+    @Autowired
+    private GameFactory gameFactory;
 
     private GameService gameService;
     private User user;
@@ -60,8 +67,8 @@ public class GameServiceTests extends BaseUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
+        IGameSynchronizer mockGameSynchronizer = new GameSynchronizer(new ViewModelConverter(), mock(IFirebaseUtil.class), gameRepository);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null, mapFactory, gameFactory);
         user = new User();
         Profile profile = new Profile();
         opponentProfile = new Profile();
@@ -75,9 +82,8 @@ public class GameServiceTests extends BaseUnitTest {
 
     private Game createGame() {
         int gameId = gameService.createGame(user.getProfile(), "SpaceCrackName", opponentProfile);
-        Game game = gameService.getGameByGameId(gameId);
 
-        return game;
+        return gameService.getGameByGameId(gameId);
     }
 
     @Transactional
@@ -92,10 +98,10 @@ public class GameServiceTests extends BaseUnitTest {
 
         gameService.moveShip(ship.getShipId(), "b");
         Player playerDb = playerRepository.findOne(player.getPlayerId());
-        Planet shipLocation = gameService.getShipLocationByShipId(ship.getShipId());
 
-        assertEquals("b", shipLocation.getName());
-        assertEquals("Player should have lost commandPoints", oldCommandPoints - GameService.MOVESHIPCOST - GameService.CREATECOLONYCOST, playerDb.getCommandPoints());
+        assertEquals("b", ship.getGame_planet().getPlanet().getName());
+//        assertEquals(ship.getGame_planet().getShip().getGame_planet(), ship.getGame_planet());
+        assertEquals("Player should have lost commandPoints", oldCommandPoints - GameService.MOVESHIPCOMMANDPOINTSCOST - GameService.CREATECOLONYCOST, playerDb.getCommandPoints());
     }
 
     @Transactional
@@ -119,8 +125,15 @@ public class GameServiceTests extends BaseUnitTest {
         Ship shipDb = shipRepository.findOne(ship.getShipId());
 
         List<Colony> colonies = shipDb.getPlayer().getColonies();
+
         assertEquals("The player should have 2 colonies", 2, colonies.size());
-        assertEquals("The second colony the player should have is on planet b.", "b", colonies.get(1).getGame_planet().getPlanet().getName());
+        Colony colony = colonies.get(1);
+        Game_Planet game_planetA = colonies.get(0).getGame_planet();
+        Game_Planet game_planetB = colony.getGame_planet();
+        assertEquals("there should be no more ship on planet a", null, game_planetA.getShip());
+        assertEquals("the ship should have moved to planet b", game_planetB.getPlanet().getName(), ship.getGame_planet().getPlanet().getName());
+
+        assertEquals("The second colony the player should have is on planet b.", "b", colony.getGame_planet().getPlanet().getName());
     }
 
     @Transactional
@@ -161,17 +174,15 @@ public class GameServiceTests extends BaseUnitTest {
     @Transactional
     @Test
     public void getAllGamesFromPlayer_validPlayer_gamesRetrieved() throws Exception {
-        Game game = createGame();
-
         IGameRepository gameRepository = mock(IGameRepository.class);
-        ArrayList<Game> expected = new ArrayList<Game>();
+        ArrayList<Game> expected = new ArrayList<>();
         expected.add(new Game());
         expected.add(new Game());
         stub(gameRepository.getGamesByProfile(user.getProfile())).toReturn(expected);
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
 
-        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
+        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null, mapFactory, gameFactory);
 
         List<Game> actual = gameService1.getGames(user);
 
@@ -188,7 +199,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
 
-        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
+        GameService gameService1 = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null, mapFactory, gameFactory);
         stub(gameRepository.findOne(expected.getId())).toReturn(expected);
 
         Game actual = gameService1.getGameByGameId(expected.getId());
@@ -203,10 +214,8 @@ public class GameServiceTests extends BaseUnitTest {
 
         Game game = createGame();
         Player player = game.getPlayers().get(0);
-        Player player2 = game.getPlayers().get(1);
         int oldCommandPoints = player.getCommandPoints();
         gameService.endTurn(player.getPlayerId());
-        // gameService.endTurn(player2.getPlayerId());
         player = playerRepository.findOne(player.getPlayerId());
 
         assertEquals(oldCommandPoints, player.getCommandPoints());
@@ -251,17 +260,18 @@ public class GameServiceTests extends BaseUnitTest {
         Ship ship = player.getShips().get(0);
         int oldAmountOfShips = player.getShips().size();
         int oldCrack = player.getCrack();
-
         gameService.moveShip(ship.getShipId(), "b");
         Player playerDb = playerRepository.findOne(player.getPlayerId());
         int oldCommandPoints = playerDb.getCommandPoints();
         Colony colony = player.getColonies().get(0);
+
         gameService.buildShip(colony.getId());
+
         playerDb = playerRepository.findOne(player.getPlayerId());
         List<Ship> playerDbShips = playerDb.getShips();
-        Ship newShip = playerDbShips.get(1);
-        assertEquals("Player should have 1 more ship", oldAmountOfShips + 1, playerDbShips.size());
 
+        assertEquals("Player should have 1 more ship", oldAmountOfShips + 1, playerDbShips.size());
+        Ship newShip = playerDbShips.get(1);
         assertEquals("The ship should have strength", GameService.NEW_SHIP_STRENGTH, newShip.getStrength());
         assertEquals("Ship should be build on colony's planet", colony.getGame_planet(), playerDbShips.get(playerDbShips.size() - 1).getGame_planet());
         assertEquals("Player should have lost 3 commandPoints", oldCommandPoints - GameService.BUILDSHIP_COST, playerDb.getCommandPoints());
@@ -341,11 +351,10 @@ public class GameServiceTests extends BaseUnitTest {
         IShipRepository mockShipRepository = mock(IShipRepository.class);
         stub(mockShipRepository.findOne(ship.getShipId())).toReturn(ship);
         IGameRepository mockGameRepository = mock(IGameRepository.class);
-        IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
         GameSynchronizer mockGameSynchronizer = mock(GameSynchronizer.class);
 
-        GameService gameServiceWithMockedMoveShipHandler = new GameService(planetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
+        GameService gameServiceWithMockedMoveShipHandler = new GameService(planetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mockGameSynchronizer, null, mapFactory, gameFactory);
         //endregion
         //region Act
         gameServiceWithMockedMoveShipHandler.moveShip(ship.getShipId(), "b");
@@ -369,7 +378,7 @@ public class GameServiceTests extends BaseUnitTest {
         IGameRepository mockGameRepository = mock(IGameRepository.class);
         IPlanetRepository mockPlanetRepository = mock(IPlanetRepository.class);
 
-        GameService gameServiceWithMockedMoveShipHandler = new GameService(mockPlanetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mock(GameSynchronizer.class), null);
+        GameService gameServiceWithMockedMoveShipHandler = new GameService(mockPlanetRepository, null, mockShipRepository, null, mockGameRepository, new ViewModelConverter(), mock(GameSynchronizer.class), null, mapFactory, gameFactory);
         gameServiceWithMockedMoveShipHandler.moveShip(ship.getShipId(), "b3");
     }
 
@@ -382,7 +391,7 @@ public class GameServiceTests extends BaseUnitTest {
         String[] planetNames = {"e", "f", "h", "i"}; // perimeter (without last conquered planet)
         String conqueredPlanetName = "c";
         String surrounded = "g"; // inside
-        List<Planet> expectedPerimeter = new ArrayList<Planet>();
+        List<Planet> expectedPerimeter = new ArrayList<>();
 
         for (String name : planetNames) {
             Planet planet = planetRepository.getPlanetByName(name);
@@ -415,7 +424,7 @@ public class GameServiceTests extends BaseUnitTest {
         String[] planetNames = {"e", "f", "h", "i"}; // perimeter (without last conquered planet)
         String conqueredPlanetName = "c";
         String surrounded = "g"; // inside
-        List<Planet> expectedPerimeter = new ArrayList<Planet>();
+        List<Planet> expectedPerimeter = new ArrayList<>();
 
         Colony newColony = new Colony();
         for (Planet planet : map.getPlanets()) { // give the player every planet on the map except for the surrounded planet
@@ -452,7 +461,7 @@ public class GameServiceTests extends BaseUnitTest {
         String[] planetNames = {"c", "i", "j", "j2", "i2", "c2", "b2"}; // perimeter (without last conquered planet)
         String conqueredPlanetName = "b";
         String[] surroundedPlanetNames = {"d", "d2"}; // inside
-        List<Planet> expectedPerimeter = new ArrayList<Planet>();
+        List<Planet> expectedPerimeter = new ArrayList<>();
 
         for (String name : planetNames) {
             Planet planet = planetRepository.getPlanetByName(name);
@@ -467,7 +476,7 @@ public class GameServiceTests extends BaseUnitTest {
 
         List<Perimeter> perimeters = game.detectPerimeter(player, newColony);
 
-        List<Planet> surroundedPlanets = new ArrayList<Planet>();
+        List<Planet> surroundedPlanets = new ArrayList<>();
         for (String name : surroundedPlanetNames) {
             surroundedPlanets.add(planetRepository.getPlanetByName(name));
         }
@@ -491,7 +500,7 @@ public class GameServiceTests extends BaseUnitTest {
         String secondPerimeterSurrounded = "g";
 
         Colony newColony = new Colony();
-        Perimeter firstExpectedPerimeter = new Perimeter(new ArrayList<Planet>(), new ArrayList<Planet>());
+        Perimeter firstExpectedPerimeter = new Perimeter(new ArrayList<>(), new ArrayList<>());
         for (String name : firstPerimeterNames) {
             Planet planet = planetRepository.getPlanetByName(name);
             Colony colony = new Colony(game.getGame_PlanetByPlanet(planet));
@@ -503,7 +512,7 @@ public class GameServiceTests extends BaseUnitTest {
         }
         firstExpectedPerimeter.getInsidePlanets().add(planetRepository.getPlanetByName(firstPerimeterSurrounded));
 
-        Perimeter secondExpectedPerimeter = new Perimeter(new ArrayList<Planet>(), new ArrayList<Planet>());
+        Perimeter secondExpectedPerimeter = new Perimeter(new ArrayList<>(), new ArrayList<>());
         for (String name : secondPerimeterNames) {
             Planet planet = planetRepository.getPlanetByName(name);
             player.addColony(new Colony(game.getGame_PlanetByPlanet(planet)));
@@ -511,7 +520,7 @@ public class GameServiceTests extends BaseUnitTest {
         }
         secondExpectedPerimeter.getInsidePlanets().add(planetRepository.getPlanetByName(secondPerimeterSurrounded));
 
-        List<Perimeter> expectedPerimeters = new ArrayList<Perimeter>();
+        List<Perimeter> expectedPerimeters = new ArrayList<>();
         expectedPerimeters.add(firstExpectedPerimeter);
         expectedPerimeters.add(secondExpectedPerimeter);
 

@@ -7,7 +7,7 @@ package be.kdg.spacecrack.filters;/* Git $Id$
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackUnauthorizedException;
-import be.kdg.spacecrack.model.AccessToken;
+import be.kdg.spacecrack.model.authentication.AccessToken;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -62,13 +62,7 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
                 sendUnauthorized(responseWrapper);
             }
 
-            if (token != null) {
-                unauthorized = false;
-
-            } else {
-                unauthorized = true;
-
-            }
+            unauthorized = (token == null);
         }
         if (unauthorized) {
             sendUnauthorized(responseWrapper);
@@ -87,7 +81,4 @@ public class TokenHandlerInterceptor extends HandlerInterceptorAdapter {
         this.authorizationService = authorizationService;
     }
 
-    public IAuthorizationService getAuthorizationService() {
-        return authorizationService;
-    }
 }

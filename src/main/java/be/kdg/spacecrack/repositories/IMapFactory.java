@@ -6,7 +6,7 @@ package be.kdg.spacecrack.repositories;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.SpaceCrackMap;
+import be.kdg.spacecrack.model.game.SpaceCrackMap;
 
 public interface IMapFactory {
 

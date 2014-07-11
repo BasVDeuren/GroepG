@@ -6,7 +6,7 @@ package be.kdg.spacecrack.viewmodels;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 
 public class ProfileWrapper {
     private int contactId;

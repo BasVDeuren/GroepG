@@ -6,7 +6,7 @@ package be.kdg.spacecrack.repositories;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.Ship;
+import be.kdg.spacecrack.model.game.Ship;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

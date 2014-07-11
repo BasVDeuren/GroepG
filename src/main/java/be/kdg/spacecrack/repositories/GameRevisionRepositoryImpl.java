@@ -6,7 +6,7 @@ package be.kdg.spacecrack.repositories;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Game;
+import be.kdg.spacecrack.model.game.Game;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,9 @@ public class GameRevisionRepositoryImpl implements GameRevisionRepository {
     public List<Integer> getRevisionNumbers(int gameId) {
         AuditReader reader = AuditReaderFactory.get(entityManagerFactory.createEntityManager());
         List<Number> revisions = reader.getRevisions(Game.class, gameId);
-        List<Integer> revisionsIntegers = new ArrayList<Integer>();
-        for (int i = 0; i < revisions.size(); i++) {
-            revisionsIntegers.add((Integer) revisions.get(i));
+        List<Integer> revisionsIntegers = new ArrayList<>();
+        for (Number revisionNumbers : revisions) {
+            revisionsIntegers.add((Integer) revisionNumbers);
         }
 
         return revisionsIntegers;

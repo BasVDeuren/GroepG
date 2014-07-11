@@ -6,8 +6,8 @@ package be.kdg.spacecrack.unittests;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.services.IMailService;
 import be.kdg.spacecrack.services.MailService;
 import org.junit.Test;

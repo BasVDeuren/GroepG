@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;
+package be.kdg.spacecrack.model.game;
 
 //import org.codehaus.jackson.annotate.JsonIgnore;
 //import org.codehaus.jackson.annotate.JsonProperty;
@@ -48,11 +48,11 @@ public class Planet {
         this.name = name;
         this.x = x;
         this.y = y;
-        planetConnections = new HashSet<PlanetConnection>();
+        planetConnections = new HashSet<>();
     }
 
     public Planet() {
-        planetConnections = new HashSet<PlanetConnection>();
+        planetConnections = new HashSet<>();
     }
 
     public int getX() {
@@ -97,7 +97,7 @@ public class Planet {
 
     @JsonProperty("connectedPlanets")
     public List<Planet> getConnectedPlanetWraps() {
-        List<Planet> connectedPlanetWraps= new ArrayList<Planet>();
+        List<Planet> connectedPlanetWraps= new ArrayList<>();
 
         for (PlanetConnection planetConnection: planetConnections) {
             Planet p = planetConnection.getChildPlanet();
@@ -121,17 +121,6 @@ public class Planet {
         }
     }
 
-    public PlanetConnection getConnectionToPlanet(Planet planet) {
-        Iterator iterator = planetConnections.iterator();
-        while(iterator.hasNext()) {
-            PlanetConnection connection = (PlanetConnection) iterator.next();
-            if(connection.getChildPlanet() == planet) {
-                return connection;
-            }
-        }
-        return null;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -139,13 +128,27 @@ public class Planet {
 
         Planet planet = (Planet) o;
 
-        if (!name.equals(planet.name)) return false;
+        return name.equals(planet.name);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    protected boolean isConnectedTo(Planet sourcePlanet) {
+
+        boolean connected = false;
+        Set<PlanetConnection> planetConnections = sourcePlanet.getPlanetConnections();
+
+        for (PlanetConnection planetConnection : planetConnections) {
+            Planet childPlanet = planetConnection.getChildPlanet();
+            String name = childPlanet.getName();
+            if (name.equals(getName())) {
+                connected = true;
+            }
+        }
+        return connected;
     }
 }

@@ -2,9 +2,9 @@ package be.kdg.spacecrack.unittests;
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackAlreadyExistsException;
 import be.kdg.spacecrack.controllers.TokenController;
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.ITokenRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
@@ -61,7 +61,7 @@ public class ProfileServiceTest extends BaseUnitTest{
         entityManager.persist(user);
 
         stub(userRepository.getUser("email", "password")).toReturn(user);
-        AccessToken accessToken = tokenController.login(user);
+        tokenController.login(user);
 
         Calendar calendar = new GregorianCalendar(2013,1,5);
 
@@ -84,7 +84,7 @@ public class ProfileServiceTest extends BaseUnitTest{
         entityManager.persist(user);
 
         stub(userRepository.getUser("email", "password" )).toReturn(user);
-        AccessToken accessToken = tokenController.login(user);
+        tokenController.login(user);
         Calendar calendar = new GregorianCalendar(2013,1,5);
 
         Profile profile = new Profile("firstname","lastname", calendar.getTime(),"image");

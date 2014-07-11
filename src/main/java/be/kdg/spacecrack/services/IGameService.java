@@ -6,7 +6,11 @@ package be.kdg.spacecrack.services;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.*;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Planet;
+import be.kdg.spacecrack.model.game.Player;
 import be.kdg.spacecrack.viewmodels.GameViewModel;
 
 import java.util.List;
@@ -15,7 +19,7 @@ public interface IGameService {
     public static final int START_COMMAND_POINTS = 8;
     public static final int COMMANDPOINTS_PER_TURN = START_COMMAND_POINTS;
     public static final int BUILDSHIP_COST = 1;
-    public static final int MOVESHIPCOST = 1;
+    public static final int MOVESHIPCOMMANDPOINTSCOST = 1;
     public static final int CREATECOLONYCOST = 1;
     public static final int NEW_SHIP_STRENGTH = 1;
     public static final int NEW_COLONY_STRENGHT = 1;

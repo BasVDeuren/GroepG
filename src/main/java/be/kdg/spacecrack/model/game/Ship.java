@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;/* Git $Id$
+package be.kdg.spacecrack.model.game;/* Git $Id$
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -17,7 +17,6 @@ import org.hibernate.envers.Audited;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Entity
 @Audited
@@ -44,14 +43,20 @@ public class Ship extends Piece {
     }
 
     public void move(Planet destinationPlanet) {
+
+
+        if(!destinationPlanet.isConnectedTo(game_planet.getPlanet())){
+            throw new SpaceCrackNotAcceptableException("Invalid move, the planets are not connected!");
+        }
+
         Game game = player.getGame();
-        player.setCommandPoints(player.getCommandPoints() - GameService.MOVESHIPCOST);
+        player.setCommandPoints(player.getCommandPoints() - GameService.MOVESHIPCOMMANDPOINTSCOST);
         List<Colony> colonies = game.getColonies();
 
         Optional<Colony> colonyOnPlanet = colonies.stream().filter(c -> c.isOnPlanet(destinationPlanet)).findFirst();
         if (colonyOnPlanet.isPresent()) {
             Colony colony = colonyOnPlanet.get();
-            if (player.getColonies().contains(colony)) {
+            if (colony.getPlayer() == player) {
                 moveToExistingColony(colony);
             } else {
                 attackEnemyColony(colony);
@@ -59,6 +64,8 @@ public class Ship extends Piece {
         } else {
             moveAndColonize(game.getGame_PlanetByPlanet(destinationPlanet));
         }
+
+        game.checkLost();
     }
 
     private void attackEnemyColony(Colony colony) {
@@ -100,7 +107,8 @@ public class Ship extends Piece {
         }
 
         player.colonizePlanet(destinationPlanet);
-        game_planet = destinationPlanet;
+        game_planet.internalSetShip(null);
+        setGame_planet(destinationPlanet);
         player.setCommandPoints(player.getCommandPoints() - IGameService.CREATECOLONYCOST);
     }
 
@@ -109,36 +117,6 @@ public class Ship extends Piece {
         shipToMergeWith.kill();
     }
 
-    /**
-     * This method checks if the move is valid.
-     * If not the method will throw an unchecked exception which will translate to HttpStatusCode 406: NotAcceptable
-     * <p>
-     * * @param destinationPlanet
-     */
-    public void validateMove(Planet destinationPlanet) {
-
-        if (player.getCommandPoints() < IGameService.MOVESHIPCOST) {
-            throw new SpaceCrackNotAcceptableException("The player cannot move because he has insufficient commandPoints!");
-        }
-
-        if (player.isTurnEnded()) {
-            throw new SpaceCrackNotAcceptableException("The player cannot execute the action because his turn has ended");
-        }
-        Planet sourcePlanet = game_planet.getPlanet();
-        boolean connected = false;
-        Set<PlanetConnection> planetConnections = sourcePlanet.getPlanetConnections();
-
-        for (PlanetConnection planetConnection : planetConnections) {
-            Planet childPlanet = planetConnection.getChildPlanet();
-            String name = childPlanet.getName();
-            if (name.equals(destinationPlanet.getName())) {
-                connected = true;
-            }
-        }
-        if (!connected) {
-            throw new SpaceCrackNotAcceptableException("Invalid move, the planets are not connected!");
-        }
-    }
 
     public int getShipId() {
         return shipId;

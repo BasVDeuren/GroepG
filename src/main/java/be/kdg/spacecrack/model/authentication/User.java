@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;
+package be.kdg.spacecrack.model.authentication;
 
 //import org.codehaus.jackson.annotate.JsonManagedReference;
 

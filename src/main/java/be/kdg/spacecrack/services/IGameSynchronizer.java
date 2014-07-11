@@ -1,14 +1,15 @@
 package be.kdg.spacecrack.services;
 
-import be.kdg.spacecrack.model.Game;
+import be.kdg.spacecrack.model.game.Game;
 
-/**
- * Created by Janne on 12/03/14.
- */
-public interface IGameSynchronizer {
+/* Git $Id$
+ *
+ * Project Application Development
+ * Karel de Grote-Hogeschool
+ * 2013-2014
+ *
+ */public interface IGameSynchronizer {
     void updateGame(Game game);
 
 
-
-    void updateGameConcurrent(Game game, Integer actionNumber);
 }

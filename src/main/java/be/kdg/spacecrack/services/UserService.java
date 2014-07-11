@@ -9,9 +9,9 @@ package be.kdg.spacecrack.services;/* Git $Id
 import be.kdg.spacecrack.Exceptions.SpaceCrackAlreadyExistsException;
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
 import be.kdg.spacecrack.Exceptions.SpaceCrackUnexpectedException;
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.IProfileRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
@@ -61,11 +61,6 @@ public class UserService implements IUserService {
     @Override
     public User getUserByAccessToken(AccessToken accessToken) throws Exception {
         return userRepository.getUserByAccessToken(accessToken);
-    }
-
-    @Override
-    public User getUserByUsername(String username) throws Exception {
-        return userRepository.findUserByUsername(username);
     }
 
     @Override

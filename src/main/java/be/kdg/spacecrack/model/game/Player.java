@@ -1,6 +1,8 @@
-package be.kdg.spacecrack.model;
+package be.kdg.spacecrack.model.game;
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackNotAcceptableException;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.game.action.Action;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.IGameService;
 import org.hibernate.annotations.LazyCollection;
@@ -31,7 +33,7 @@ public class Player {
     private int playerId;
 
 
-    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "profileId")
     private Profile profile;
 
@@ -53,13 +55,15 @@ public class Player {
     private boolean turnEnded;
 
     @Column
-    private boolean requestAccepted;
+    private boolean readyToPlay;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Game game;
 
     @Version
     private int versionNumber;
+
+
     public int getCommandPoints() {
         return commandPoints;
     }
@@ -68,15 +72,16 @@ public class Player {
         this.commandPoints = commandPoints;
     }
 
-    public boolean isRequestAccepted() {
-        return requestAccepted;
+    public boolean isReadyToPlay() {
+        return readyToPlay;
     }
 
-    public void setRequestAccepted(boolean requestAccepted) {
-        this.requestAccepted = requestAccepted;
+    public void setReadyToPlay(boolean requestAccepted) {
+        this.readyToPlay = requestAccepted;
     }
 
-    public Player() {}
+    public Player() {
+    }
 
     public Player(Profile profile) {
         this.profile = profile;
@@ -106,7 +111,6 @@ public class Player {
         this.profile = profile;
         profile.internalAddPlayer(this);
     }
-
 
     public List<Colony> getColonies() {
         return colonies;
@@ -138,7 +142,6 @@ public class Player {
     }
 
     public void addColony(Colony colony) {
-
         colonies.add(colony);
         colony.internalSetPlayer(this);
     }
@@ -180,7 +183,6 @@ public class Player {
 
     public void addCrack(int crack) {
         this.crack += crack;
-
     }
 
     protected void colonizePlanet(Game_Planet game_planet) {
@@ -188,16 +190,13 @@ public class Player {
         colonizePerimeteredPlanets(colony);
     }
 
-
-    private void colonizePerimeteredPlanets( Colony colony) {
+    private void colonizePerimeteredPlanets(Colony colony) {
         List<Perimeter> perimeters = game.detectPerimeter(this, colony);
-
         List<Colony> coloniesByGame = game.getColonies();
         List<Ship> shipsByGame = game.getShips();
 
         for (Perimeter perimeter : perimeters) {
             List<Planet> insidePlanets = perimeter.getInsidePlanets();
-
             insidePlanets.forEach(insidePlanet -> {
                 //If there is an existing colony on the insidePlanet delete it
                 coloniesByGame.stream()
@@ -205,7 +204,7 @@ public class Player {
                         .forEach(Colony::kill);
                 //If there is a ship the enemy player on the insidePlanet delete it
                 shipsByGame.stream()
-                        .filter(s -> s.isOnPlanet( insidePlanet) && s.getPlayer().getPlayerId() != playerId)
+                        .filter(s -> s.isOnPlanet(insidePlanet) && s.getPlayer().getPlayerId() != playerId)
                         .forEach(Ship::kill);
                 //Create new Colonies on the insidePlanets.
                 Colony newColony = new Colony();
@@ -216,47 +215,38 @@ public class Player {
         }
     }
 
-
     public void endTurn() {
         if (!isTurnEnded()) {
-
             setTurnEnded(true);
             game.notifyTurnEnded(this);
         } else {
             throw new SpaceCrackNotAcceptableException("Turn is already ended");
         }
-
-
     }
-
-
 
     public void startNewTurn() {
 
         int commandPoints = getCommandPoints();
         setCommandPoints(commandPoints + IGameService.COMMANDPOINTS_PER_TURN);
-        getColonies().forEach(colony ->  addCrack(IGameService.CRACK_PER_COLONY));
+        getColonies().forEach(colony -> addCrack(IGameService.CRACK_PER_COLONY));
         setTurnEnded(false);
     }
 
+    public void execute(Action action) {
+        if(game.isFinished())        {
+            throw new SpaceCrackNotAcceptableException("Game is already finished.");
+        }
+        if (turnEnded) {
+            throw new SpaceCrackNotAcceptableException("Your turn has ended.");
+        }
+        if (commandPoints < action.getCommandPointsCost()) {
+            throw new SpaceCrackNotAcceptableException("Insufficient commandpoints.");
+        }
+        if (crack < action.getCrackCost()) {
+            throw new SpaceCrackNotAcceptableException("Insufficient crack.");
+        }
+        action.execute();
+        game.incrementActionNumber();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Player)) return false;
-
-        Player player = (Player) o;
-
-        if (!game.equals(player.game)) return false;
-        if (!profile.equals(player.profile)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = profile.hashCode();
-        result = 31 * result + game.hashCode();
-        return result;
     }
 }

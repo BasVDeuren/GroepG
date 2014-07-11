@@ -6,7 +6,7 @@ package be.kdg.spacecrack.services;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -37,7 +37,7 @@ public class MailService implements IMailService {
         }
         String expectedMessage = "Hello there, your friend " + textToShow + " invites you for a game of spacecrack, would you like to register?\n" +
                 "This can be done at our website: " + SPACECRACKWEBSITEURL;
-        ;
+
 
         simpleMailMessage.setText(expectedMessage);
         mailSender.send(simpleMailMessage);

@@ -7,9 +7,9 @@ package be.kdg.spacecrack.services;/* Git $Id
  */
 
 import be.kdg.spacecrack.Exceptions.SpaceCrackUnauthorizedException;
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.Profile;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.ITokenRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import be.kdg.spacecrack.utilities.ITokenStringGenerator;
@@ -56,9 +56,9 @@ public class AuthorizationService implements IAuthorizationService {
         }
 
         byte[] byteData = md5.digest(testPassword.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < byteData.length; i++) {
-            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+        StringBuilder sb = new StringBuilder();
+        for (byte aByteData : byteData) {
+            sb.append(Integer.toString((aByteData & 0xff) + 0x100, 16).substring(1));
         }
         return sb.toString();
     }

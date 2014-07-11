@@ -1,8 +1,8 @@
 package be.kdg.spacecrack.integrationtests;
 
 
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.repositories.ITokenRepository;
 import be.kdg.spacecrack.repositories.IUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

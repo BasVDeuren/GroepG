@@ -6,7 +6,7 @@ package be.kdg.spacecrack.services;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 
 public interface IMailService {
     void sendInvite(User sender, String receiver);

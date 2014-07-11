@@ -6,10 +6,10 @@ package be.kdg.spacecrack.unittests;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Game_Planet;
-import be.kdg.spacecrack.model.Player;
-import be.kdg.spacecrack.model.Ship;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Game_Planet;
+import be.kdg.spacecrack.model.game.Player;
+import be.kdg.spacecrack.model.game.Ship;
 import be.kdg.spacecrack.repositories.IGameRepository;
 import be.kdg.spacecrack.repositories.IShipRepository;
 import org.junit.Before;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.Assert.assertNotNull;
 
 
-public class ShipRepositoryTests extends  BaseUnitTest{
+public class ShipRepositoryTests extends BaseUnitTest {
     @Autowired
     private IShipRepository shipRepository;
     @Autowired

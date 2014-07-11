@@ -1,6 +1,6 @@
 package be.kdg.spacecrack.repositories;
 
-import be.kdg.spacecrack.model.Profile;
+import be.kdg.spacecrack.model.authentication.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

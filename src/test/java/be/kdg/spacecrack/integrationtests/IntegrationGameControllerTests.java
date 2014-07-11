@@ -7,7 +7,7 @@ package be.kdg.spacecrack.integrationtests;/* Git $Id$
  */
 
 import be.kdg.spacecrack.controllers.ActionController;
-import be.kdg.spacecrack.model.Profile;
+import be.kdg.spacecrack.model.authentication.Profile;
 import be.kdg.spacecrack.services.GameService;
 import be.kdg.spacecrack.services.IGameService;
 import be.kdg.spacecrack.utilities.IFirebaseUtil;

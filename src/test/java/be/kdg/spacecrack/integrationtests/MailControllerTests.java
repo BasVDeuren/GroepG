@@ -8,8 +8,8 @@ package be.kdg.spacecrack.integrationtests;/* Git $Id
 
 import be.kdg.spacecrack.controllers.MailController;
 import be.kdg.spacecrack.filters.TokenHandlerInterceptor;
-import be.kdg.spacecrack.model.AccessToken;
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.AccessToken;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IMailService;
 import be.kdg.spacecrack.viewmodels.EmailAdressViewModel;

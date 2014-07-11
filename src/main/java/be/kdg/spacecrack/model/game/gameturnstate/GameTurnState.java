@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model.gameturnstate;/* Git $Id$
+package be.kdg.spacecrack.model.game.gameturnstate;/* Git $Id$
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -6,8 +6,8 @@ package be.kdg.spacecrack.model.gameturnstate;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Game;
-import be.kdg.spacecrack.model.Player;
+import be.kdg.spacecrack.model.game.Game;
+import be.kdg.spacecrack.model.game.Player;
 import lombok.NonNull;
 
 public enum GameTurnState implements IGameTurnState{

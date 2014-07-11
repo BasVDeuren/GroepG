@@ -6,7 +6,7 @@ package be.kdg.spacecrack.repositories;/* Git $Id$
  *
  */
 
-import be.kdg.spacecrack.model.Game;
+import be.kdg.spacecrack.model.game.Game;
 
 import java.util.List;
 

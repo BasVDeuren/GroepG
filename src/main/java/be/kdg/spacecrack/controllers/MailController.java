@@ -6,7 +6,7 @@ package be.kdg.spacecrack.controllers;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.User;
+import be.kdg.spacecrack.model.authentication.User;
 import be.kdg.spacecrack.services.IAuthorizationService;
 import be.kdg.spacecrack.services.IMailService;
 import be.kdg.spacecrack.viewmodels.EmailAdressViewModel;

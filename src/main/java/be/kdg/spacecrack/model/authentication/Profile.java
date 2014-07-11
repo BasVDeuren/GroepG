@@ -1,5 +1,6 @@
-package be.kdg.spacecrack.model;
+package be.kdg.spacecrack.model.authentication;
 
+import be.kdg.spacecrack.model.game.Player;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cascade;
@@ -48,7 +49,7 @@ public class Profile {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "profile")
     @JsonIgnore
-    private List<Player> players = new ArrayList<Player>();
+    private List<Player> players = new ArrayList<>();
 
     public User getUser() {
         return user;
@@ -126,5 +127,27 @@ public class Profile {
 
     public void internalAddPlayer(Player player) {
         players.add(player);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Profile)) return false;
+
+        Profile profile = (Profile) o;
+
+        if (dayOfBirth != null ? !dayOfBirth.equals(profile.dayOfBirth) : profile.dayOfBirth != null) return false;
+        if (firstname != null ? !firstname.equals(profile.firstname) : profile.firstname != null) return false;
+        if (lastname != null ? !lastname.equals(profile.lastname) : profile.lastname != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = firstname != null ? firstname.hashCode() : 0;
+        result = 31 * result + (lastname != null ? lastname.hashCode() : 0);
+        result = 31 * result + (dayOfBirth != null ? dayOfBirth.hashCode() : 0);
+        return result;
     }
 }

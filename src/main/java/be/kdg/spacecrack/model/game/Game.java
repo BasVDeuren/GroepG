@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;/* Git $Id
+package be.kdg.spacecrack.model.game;/* Git $Id
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -6,7 +6,7 @@ package be.kdg.spacecrack.model;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.gameturnstate.GameTurnState;
+import be.kdg.spacecrack.model.game.gameturnstate.GameTurnState;
 import be.kdg.spacecrack.services.GraphAlgorithm;
 import lombok.NonNull;
 import org.hibernate.annotations.LazyCollection;
@@ -20,7 +20,6 @@ import javax.persistence.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Entity
 @Audited
@@ -35,10 +34,13 @@ public class Game {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "game")
-    private List<Player> players = new ArrayList<Player>();
+    private List<Player> players = new ArrayList<>();
 
     @Column
     private int actionNumber;
+
+    @Version
+    private int version;
 
     @Column
     private int loserPlayerId;
@@ -159,11 +161,8 @@ public class Game {
 
     public List<Planet> getPlanets() {
         List<Planet> planets = new ArrayList<Planet>();
-        gamePlanets.forEach(new Consumer<Game_Planet>() {
-            @Override
-            public void accept(Game_Planet game_planet) {
-                planets.add(game_planet.getPlanet());
-            }
+        gamePlanets.forEach(game_planet -> {
+            planets.add(game_planet.getPlanet());
         });
         return planets;
     }
@@ -173,12 +172,12 @@ public class Game {
      */
     public List<Perimeter> detectPerimeter(Player player, Colony newColony) {
         // List of perimeters to return
-        List<Perimeter> perimeters = new ArrayList<Perimeter>();
+        List<Perimeter> perimeters = new ArrayList<>();
         // Get all colonies of this player (= the graph to find perimeters within)
-        UndirectedGraph<String, DefaultEdge> graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+        UndirectedGraph<String, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         List<Colony> colonies = player.getColonies();
-        Map<String, Planet> playerPlanetsMap = new HashMap<String, Planet>();
-        List<Planet> playerPlanetsList = new ArrayList<Planet>();
+        Map<String, Planet> playerPlanetsMap = new HashMap<>();
+        List<Planet> playerPlanetsList = new ArrayList<>();
         // add colonies to the graph
         for (Colony colony : colonies) {
             Planet planet = colony.getGame_planet().getPlanet();
@@ -209,7 +208,7 @@ public class Game {
 
         // For every cycles, make a possible perimeter
         for (List<String> cycle : cycles) {
-            Perimeter perimeter = new Perimeter(new ArrayList<Planet>(), new ArrayList<Planet>());
+            Perimeter perimeter = new Perimeter(new ArrayList<>(), new ArrayList<>());
             for (String vertex : cycle) {
                 Planet planet = playerPlanetsMap.get(vertex);
                 perimeter.getOutsidePlanets().add(planet);
@@ -219,7 +218,7 @@ public class Game {
 
         // For every polygon (=cycle) test if it contains a target planet
         for (Planet target : targetPlanets) {
-            List<Perimeter> perimetersForTarget = new ArrayList<Perimeter>();
+            List<Perimeter> perimetersForTarget = new ArrayList<>();
             for (Perimeter perimeter : perimeters) {
                 Polygon polygon = new Polygon();
                 for (Planet planet : perimeter.getOutsidePlanets()) {
@@ -260,4 +259,29 @@ public class Game {
     }
 
 
+    public boolean isFinished() {
+        return loserPlayerId != 0;
+    }
+
+    public void checkLost() {
+        for (Player player : getPlayers()) {
+            if (player.getColonies().size() == 0) {
+                setLoserPlayerId(player.getPlayerId());
+            }
+        }
+    }
+
+    public void readyThePlayers() {
+        for (Player p : getPlayers()) {
+            p.setReadyToPlay(true);
+        }
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    protected void setVersion(int version) {
+        this.version = version;
+    }
 }

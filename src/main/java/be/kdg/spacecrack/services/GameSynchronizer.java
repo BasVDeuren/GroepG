@@ -1,7 +1,7 @@
 package be.kdg.spacecrack.services;
 
 import be.kdg.spacecrack.controllers.GameController;
-import be.kdg.spacecrack.model.Game;
+import be.kdg.spacecrack.model.game.Game;
 import be.kdg.spacecrack.repositories.IGameRepository;
 import be.kdg.spacecrack.utilities.IFirebaseUtil;
 import be.kdg.spacecrack.utilities.IViewModelConverter;
@@ -9,10 +9,13 @@ import be.kdg.spacecrack.viewmodels.GameViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by Janne on 12/03/14.
- */
-@Component("gameSynchronizer")
+/* Git $Id$
+ *
+ * Project Application Development
+ * Karel de Grote-Hogeschool
+ * 2013-2014
+ *
+ */@Component("gameSynchronizer")
 public class GameSynchronizer implements IGameSynchronizer {
     @Autowired
     private IViewModelConverter viewModelConverter;
@@ -40,25 +43,4 @@ public class GameSynchronizer implements IGameSynchronizer {
 
     }
 
-    @Override
-    public void updateGameConcurrent(Game game, Integer actionNumber) {
-        boolean success;
-        if (gameRepository.getGameOptimisticConcurrent(game.getId(), actionNumber) != null) {
-            success = true;
-        }else{
-            success = false;
-        }
-        GameViewModel firebaseResult;
-        if (success) {
-            firebaseResult = viewModelConverter.convertGameToViewModel(game);
-        } else {
-            Game gameFromDb = gameRepository.findOne(game.getId());
-            firebaseResult = viewModelConverter.convertGameToViewModel(gameFromDb);
-        }
-
-
-        firebaseUtil.setValue(GameController.GAMESUFFIX + firebaseResult.getGameId(), firebaseResult);
-
-
-    }
 }

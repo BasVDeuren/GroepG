@@ -1,4 +1,4 @@
-package be.kdg.spacecrack.model;/* Git $Id
+package be.kdg.spacecrack.model.game;/* Git $Id
  *
  * Project Application Development
  * Karel de Grote-Hogeschool
@@ -8,6 +8,7 @@ package be.kdg.spacecrack.model;/* Git $Id
 
 //import org.codehaus.jackson.annotate.JsonIgnore;
 
+import be.kdg.spacecrack.services.IGameService;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -44,6 +45,24 @@ public class Colony extends Piece {
         player.removeColony(this);
     }
 
+    public void buildShip() {
+        Ship shipOnPlanet =  game_planet.getShip();
+
+        if (shipOnPlanet == null) {
+            Ship ship = new Ship();
+            ship.setStrength(IGameService.NEW_SHIP_STRENGTH);
+            ship.setPlayer(player);
+            ship.setGame_planet(game_planet);
+        } else {
+            shipOnPlanet.setStrength(shipOnPlanet.getStrength() + IGameService.NEW_SHIP_STRENGTH);
+        }
+
+        player.setCommandPoints(player.getCommandPoints() - IGameService.BUILDSHIP_COST);
+        player.setCrack(player.getCrack() - IGameService.BUILDSHIP_CRACK_COST);
+
+    }
+
+
     public int getId() {
         return id;
     }
@@ -78,7 +97,7 @@ public class Colony extends Piece {
         this.game_planet = game_planet;
     }
 
-    @Deprecated
+
     public void setPlanet(Planet planet) {
         setGame_planet(player.getGame().getGame_PlanetByPlanet(planet));
     }

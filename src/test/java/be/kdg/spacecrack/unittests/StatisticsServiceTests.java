@@ -6,7 +6,9 @@ package be.kdg.spacecrack.unittests;/* Git $Id
  *
  */
 
-import be.kdg.spacecrack.model.*;
+import be.kdg.spacecrack.model.authentication.Profile;
+import be.kdg.spacecrack.model.authentication.User;
+import be.kdg.spacecrack.model.game.*;
 import be.kdg.spacecrack.repositories.*;
 import be.kdg.spacecrack.services.*;
 import be.kdg.spacecrack.utilities.ViewModelConverter;
@@ -40,11 +42,15 @@ public class StatisticsServiceTests extends BaseUnitTest {
     private IPlayerRepository playerRepository;
     @Autowired
     private IShipRepository shipRepository;
+    @Autowired
+    private GameFactory gameFactory;
+    @Autowired
+    private IMapFactory mapFactory;
 
     @Before
     public void setUp() throws Exception {
         IGameSynchronizer mockGameSynchronizer = mock(IGameSynchronizer.class);
-        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null);
+        gameService = new GameService(planetRepository, colonyRepository, shipRepository, playerRepository, gameRepository, new ViewModelConverter(), mockGameSynchronizer, null, mapFactory, gameFactory);
 
         mockGameRepository = mock(IGameRepository.class);
         mockProfileRepository = mock(IProfileRepository.class);
@@ -63,7 +69,7 @@ public class StatisticsServiceTests extends BaseUnitTest {
     public void getStatistics_ProfilePlayed0Games_allStatistics0() throws Exception {
         Profile profile = new Profile();
 
-        stub(mockGameRepository.getGamesByProfile(profile)).toReturn(new ArrayList<Game>());
+        stub(mockGameRepository.getGamesByProfile(profile)).toReturn(new ArrayList<>());
 
         stub(mockProfileRepository.findOne(1)).toReturn(profile);
         StatisticsViewModel statisticsViewModel = statisticsService.getStatistics(1);
@@ -107,7 +113,7 @@ public class StatisticsServiceTests extends BaseUnitTest {
         Game game2 = getOverGameWithColoniesAndShips(2, 100, 3, 1, profile, opponentProfile);
         Game game3 = getOverGameWithColoniesAndShips(3, 0, 0, 0, profile, opponentProfile);
 
-        List<Game> games = new ArrayList<Game>();
+        List<Game> games = new ArrayList<>();
         games.add(game1);
         games.add(game2);
         games.add(game3);
@@ -144,9 +150,9 @@ public class StatisticsServiceTests extends BaseUnitTest {
 
         for (int i = 0; i < amountOfColonies; i++) {
             Colony colony = new Colony();
-            Planet planet = null;
+            Planet planet = new Planet();
             Game_Planet game_planet = new Game_Planet(planet);
-            planet = new Planet();
+
             colony.setGame_planet(game_planet);
             player1.addColony(colony);
         }
@@ -157,8 +163,7 @@ public class StatisticsServiceTests extends BaseUnitTest {
 
     private Game createGame() {
         int gameId = gameService.createGame(user.getProfile(), "SpaceCrackName8", opponentProfile);
-        Game game = gameService.getGameByGameId(gameId);
 
-        return game;
+        return gameService.getGameByGameId(gameId);
     }
 }
